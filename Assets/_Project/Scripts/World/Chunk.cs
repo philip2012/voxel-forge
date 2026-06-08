@@ -98,6 +98,8 @@ public class Chunk : MonoBehaviour
         Debug.Log(visibleFaceCount);
         Debug.Log(vertices.Count);
         Debug.Log(triangles.Count);
+
+        ApplyMesh();
     }
 
     private bool IsVoxelInsideChunk(int x, int y, int z)
@@ -133,5 +135,19 @@ public class Chunk : MonoBehaviour
         triangles.Add(vertexIndex + 2);
         triangles.Add(vertexIndex + 1);
         triangles.Add(vertexIndex + 3);
+    }
+    
+    private void ApplyMesh()
+    {
+        Mesh mesh = new Mesh
+        {
+            vertices = vertices.ToArray(),
+            triangles = triangles.ToArray()
+        };
+
+        mesh.RecalculateNormals();
+
+        meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = mesh;
     }
 }
