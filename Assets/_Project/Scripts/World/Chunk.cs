@@ -14,6 +14,8 @@ public class Chunk : MonoBehaviour
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
 
+    private List<Vector2> uvs = new List<Vector2>();
+
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
@@ -61,6 +63,7 @@ public class Chunk : MonoBehaviour
     {
         vertices.Clear();
         triangles.Clear();
+        uvs.Clear();
 
         int solidBlockCount = 0;
         int visibleFaceCount = 0;
@@ -98,6 +101,7 @@ public class Chunk : MonoBehaviour
         Debug.Log(visibleFaceCount);
         Debug.Log(vertices.Count);
         Debug.Log(triangles.Count);
+        Debug.Log(uvs.Count);
 
         ApplyMesh();
     }
@@ -135,6 +139,11 @@ public class Chunk : MonoBehaviour
         triangles.Add(vertexIndex + 2);
         triangles.Add(vertexIndex + 1);
         triangles.Add(vertexIndex + 3);
+
+        uvs.Add(new Vector2(0, 0));
+        uvs.Add(new Vector2(0, 1));
+        uvs.Add(new Vector2(1, 0));
+        uvs.Add(new Vector2(1, 1));
     }
     
     private void ApplyMesh()
@@ -142,7 +151,8 @@ public class Chunk : MonoBehaviour
         Mesh mesh = new Mesh
         {
             vertices = vertices.ToArray(),
-            triangles = triangles.ToArray()
+            triangles = triangles.ToArray(),
+            uv = uvs.ToArray(),
         };
 
         mesh.RecalculateNormals();
