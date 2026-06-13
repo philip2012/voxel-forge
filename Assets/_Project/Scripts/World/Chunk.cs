@@ -16,6 +16,9 @@ public class Chunk : MonoBehaviour
 
     private List<Vector2> uvs = new List<Vector2>();
 
+    public const int TextureAtlasSize = 16; // Unit: Blocks
+    public const float NormalizedBlockTextureSize = 1f / TextureAtlasSize;
+
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
