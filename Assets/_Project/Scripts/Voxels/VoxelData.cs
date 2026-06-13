@@ -11,6 +11,9 @@ public static class VoxelData
 
     // formula to convert 3d block into a index for 1d array
     // index = x + ChunkWidth * (y + ChunkHeight * z)
+
+    public const int TextureAtlasSizeInBlocks = 16;
+    public const float NormalizedBlockTextureSize = 1f / TextureAtlasSizeInBlocks;
     
     public static readonly Vector3[] VoxelVertices = new Vector3[]
     {

@@ -16,9 +16,6 @@ public class Chunk : MonoBehaviour
 
     private List<Vector2> uvs = new List<Vector2>();
 
-    public const int TextureAtlasSize = 16; // Unit: Blocks
-    public const float NormalizedBlockTextureSize = 1f / TextureAtlasSize;
-
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
@@ -145,10 +142,18 @@ public class Chunk : MonoBehaviour
         triangles.Add(vertexIndex + 1);
         triangles.Add(vertexIndex + 3);
 
-        uvs.Add(new Vector2(0, 0));
-        uvs.Add(new Vector2(0, 1));
-        uvs.Add(new Vector2(1, 0));
-        uvs.Add(new Vector2(1, 1));
+        BlockType blockType = GetVoxel(x, y, z);
+        BlockData blockData = BlockDatabase.GetBlockData(blockType);
+        Vector2Int textureTile = blockData.GetTextureForFace(faceIndex);
+
+        float textureSize = VoxelData.NormalizedBlockTextureSize;
+        float u = textureTile.x * textureSize;
+        float v = textureTile.y * textureSize;
+
+        uvs.Add(new Vector2(u, v));
+        uvs.Add(new Vector2(u, v + textureSize));
+        uvs.Add(new Vector2(u + textureSize, v));
+        uvs.Add(new Vector2(u + textureSize, v + textureSize));
     }
     
     private void ApplyMesh()
