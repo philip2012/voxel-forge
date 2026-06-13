@@ -121,7 +121,9 @@ public class Chunk : MonoBehaviour
             return false;
         }
         
-        return GetVoxel(x, y, z) != BlockType.Air;
+        BlockType blockType = GetVoxel(x, y, z);
+        BlockData blockData = BlockDatabase.GetBlockData(blockType);
+        return blockData.isSolid;
     }
 
     private void AddFace(int x, int y, int z, int faceIndex)
