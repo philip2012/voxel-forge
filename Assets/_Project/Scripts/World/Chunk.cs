@@ -147,13 +147,17 @@ public class Chunk : MonoBehaviour
         Vector2Int textureTile = blockData.GetTextureForFace(faceIndex);
 
         float textureSize = VoxelData.NormalizedBlockTextureSize;
-        float u = textureTile.x * textureSize;
-        float v = textureTile.y * textureSize;
+        float padding = VoxelData.TexturePadding;
 
-        uvs.Add(new Vector2(u, v));
-        uvs.Add(new Vector2(u, v + textureSize));
-        uvs.Add(new Vector2(u + textureSize, v));
-        uvs.Add(new Vector2(u + textureSize, v + textureSize));
+        float uMin = textureTile.x * textureSize + padding;
+        float vMin = textureTile.y * textureSize + padding;
+        float uMax = (textureTile.x + 1) * textureSize - padding;
+        float vMax = (textureTile.y + 1) * textureSize - padding;
+        
+        uvs.Add(new Vector2(uMin, vMin));
+        uvs.Add(new Vector2(uMin, vMax));
+        uvs.Add(new Vector2(uMax, vMin));
+        uvs.Add(new Vector2(uMax, vMax));
     }
     
     private void ApplyMesh()

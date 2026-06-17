@@ -14,6 +14,8 @@ public static class VoxelData
 
     public const int TextureAtlasSizeInBlocks = 16;
     public const float NormalizedBlockTextureSize = 1f / TextureAtlasSizeInBlocks;
+
+    public const float TexturePadding = 0.002f;
     
     public static readonly Vector3[] VoxelVertices = new Vector3[]
     {
