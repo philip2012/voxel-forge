@@ -65,9 +65,6 @@ public class Chunk : MonoBehaviour
         triangles.Clear();
         uvs.Clear();
 
-        int solidBlockCount = 0;
-        int visibleFaceCount = 0;
-
         for (int x = 0; x < VoxelData.ChunkWidth; x++)
         {
             for (int y = 0; y < VoxelData.ChunkHeight; y++)
@@ -76,7 +73,6 @@ public class Chunk : MonoBehaviour
                 {
                     if (GetVoxel(x, y, z) != BlockType.Air)
                     {
-                        solidBlockCount++;
                         for (int faceIndex = 0; faceIndex < VoxelData.FaceChecks.Length; faceIndex++)
                         {
                             Vector3Int neighborOffset = VoxelData.FaceChecks[faceIndex];
@@ -87,7 +83,6 @@ public class Chunk : MonoBehaviour
 
                             if (!CheckVoxel(neighborX, neighborY, neighborZ))
                             {
-                                visibleFaceCount++;
                                 AddFace(x, y, z, faceIndex);
                             }
                         }
@@ -96,12 +91,6 @@ public class Chunk : MonoBehaviour
                 }
             }
         }
-
-        Debug.Log(solidBlockCount);
-        Debug.Log(visibleFaceCount);
-        Debug.Log(vertices.Count);
-        Debug.Log(triangles.Count);
-        Debug.Log(uvs.Count);
 
         ApplyMesh();
     }
