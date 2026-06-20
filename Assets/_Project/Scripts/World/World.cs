@@ -6,7 +6,13 @@ public class World: MonoBehaviour
 
     private void Start()
     {
-        SpawnChunk(Vector2Int.zero);
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int z = -1; z <= 1; z++)
+            {
+                SpawnChunk(new Vector2Int(x, z));
+            }
+        }
     }
 
     private Chunk SpawnChunk(Vector2Int chunkCoordinate)
