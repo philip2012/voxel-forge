@@ -6,6 +6,20 @@ public class World: MonoBehaviour
 
     private void Start()
     {
-        Instantiate(chunkPrefab, Vector3.zero, Quaternion.identity);
+        SpawnChunk(Vector2Int.zero);
+    }
+
+    private Chunk SpawnChunk(Vector2Int chunkCoordinate)
+    {
+        Vector3 worldPosition = new Vector3(
+            chunkCoordinate.x * VoxelData.ChunkWidth,
+            0,
+            chunkCoordinate.y * VoxelData.ChunkWidth
+        );
+
+        Chunk chunk = Instantiate(chunkPrefab, worldPosition, Quaternion.identity, transform);
+        chunk.name = $"Chunk ({chunkCoordinate.x}, {chunkCoordinate.y})";
+
+        return chunk;
     }
 }
