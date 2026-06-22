@@ -10,6 +10,8 @@ public class Chunk : MonoBehaviour
     private MeshFilter meshFilter;
     private MeshCollider meshCollider;
     private byte[] voxelMap = new byte[VoxelData.ChunkVoxelCount];
+    private World world;
+    private Vector2Int chunkCoordinate;
 
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
@@ -20,6 +22,12 @@ public class Chunk : MonoBehaviour
     {
         meshFilter = GetComponent<MeshFilter>();
         meshCollider = GetComponent<MeshCollider>();
+    }
+
+    public void Initialize(World world, Vector2Int chunkCoordinate)
+    {
+        this.world = world;
+        this.chunkCoordinate = chunkCoordinate;
 
         PopulateVoxelMap();
         GenerateMesh();

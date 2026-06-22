@@ -32,6 +32,7 @@ public class World : MonoBehaviour
         Chunk chunk = Instantiate(chunkPrefab, worldPosition, Quaternion.identity, transform);
         chunk.name = $"Chunk ({chunkCoordinate.x}, {chunkCoordinate.y})";
         activeChunks.Add(chunkCoordinate, chunk);
+        chunk.Initialize(this, chunkCoordinate);
 
         return chunk;
     }
