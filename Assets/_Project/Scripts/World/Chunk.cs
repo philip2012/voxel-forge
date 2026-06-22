@@ -33,6 +33,16 @@ public class Chunk : MonoBehaviour
         GenerateMesh();
     }
 
+    public BlockType GetVoxelFromLocalPosition(int x, int y, int z)
+    {
+        if (!IsVoxelInsideChunk(x, y, z))
+        {
+            return BlockType.Air;
+        }
+
+        return GetVoxel(x, y, z);
+    }
+
     private int GetVoxelIndex(int x, int y, int z)
     {
         return x + VoxelData.ChunkWidth * (y + VoxelData.ChunkHeight * z);

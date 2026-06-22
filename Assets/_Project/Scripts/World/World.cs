@@ -15,6 +15,34 @@ public class World : MonoBehaviour
                 SpawnChunk(new Vector2Int(x, z));
             }
         }
+
+        Debug.Log(GetBlock(new Vector3Int(0, 4, 0)));
+        Debug.Log(GetBlock(new Vector3Int(16, 4, 0)));
+        Debug.Log(GetBlock(new Vector3Int(-1, 4, 0)));
+        Debug.Log(GetBlock(new Vector3Int(0, 10, 0)));
+    }
+
+    public BlockType GetBlock(Vector3Int globalPosition)
+    {
+        if (globalPosition.y < 0 || globalPosition.y >= VoxelData.ChunkHeight)
+        {
+            return BlockType.Air;
+        }
+
+        int chunkX = Mathf.FloorToInt((float)globalPosition.x / VoxelData.ChunkWidth);
+        int chunkZ = Mathf.FloorToInt((float)globalPosition.z / VoxelData.ChunkWidth);
+
+        int localX = globalPosition.x - chunkX * VoxelData.ChunkWidth;
+        int localZ = globalPosition.z - chunkZ * VoxelData.ChunkWidth;
+
+        Vector2Int chunkCoordinate = new Vector2Int(chunkX, chunkZ);
+
+        if (!activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+        {
+            return BlockType.Air;
+        }
+
+        return chunk.GetVoxelFromLocalPosition(localX, globalPosition.y, localZ);
     }
 
     private Chunk SpawnChunk(Vector2Int chunkCoordinate)
