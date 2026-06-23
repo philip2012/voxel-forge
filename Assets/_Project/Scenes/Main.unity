@@ -413,6 +413,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::World
   chunkPrefab: {fileID: 2345644168970911497, guid: aab50d376ac454a77b8778a69af2b0fd, type: 3}
+  viewDistanceInChunks: 2
 --- !u!4 &2118334476
 Transform:
   m_ObjectHideFlags: 0

@@ -4,13 +4,14 @@ using System.Collections.Generic;
 public class World : MonoBehaviour
 {
     [SerializeField] private Chunk chunkPrefab;
+    [SerializeField, Min(0)] private int viewDistanceInChunks = 1;    
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
 
     private void Start()
     {
-        for (int x = -1; x <= 1; x++)
+        for (int x = -viewDistanceInChunks; x <= viewDistanceInChunks; x++)
         {
-            for (int z = -1; z <= 1; z++)
+            for (int z = -viewDistanceInChunks; z <= viewDistanceInChunks; z++)
             {
                 SpawnChunk(new Vector2Int(x, z));
             }
