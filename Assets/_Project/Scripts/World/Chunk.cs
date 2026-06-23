@@ -70,13 +70,29 @@ public class Chunk : MonoBehaviour
         {
             for (int z = 0; z < VoxelData.ChunkWidth; z++)
             {
-                SetVoxel(x, 0, z, BlockType.Bedrock);
+                int globalX = chunkCoordinate.x * VoxelData.ChunkWidth + x;
+                int globalZ = chunkCoordinate.y * VoxelData.ChunkWidth + z;
+                int terrainHeight = world.GetTerrainHeight(globalX, globalZ);
 
-                SetVoxel(x, 1, z, BlockType.Dirt);
-                SetVoxel(x, 2, z, BlockType.Dirt);
-                SetVoxel(x, 3, z, BlockType.Dirt);
-
-                SetVoxel(x, 4, z, BlockType.Grass);
+                for (int y = 0; y <= terrainHeight; y++)
+                {
+                    if (y == 0)
+                    {
+                        SetVoxel(x, y, z, BlockType.Bedrock);
+                    }
+                    else if (y == terrainHeight)
+                    {
+                        SetVoxel(x, y, z, BlockType.Grass);
+                    }
+                    else if (y >= terrainHeight - 3)
+                    {
+                        SetVoxel(x, y, z, BlockType.Dirt);
+                    }
+                    else
+                    {
+                        SetVoxel(x, y, z, BlockType.Stone);
+                    }
+                }
             }
         }
     }

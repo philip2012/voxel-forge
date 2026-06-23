@@ -5,6 +5,10 @@ public class World : MonoBehaviour
 {
     [SerializeField] private Chunk chunkPrefab;
     [SerializeField, Min(0)] private int viewDistanceInChunks = 1;    
+    [SerializeField] private int baseTerrainHeight = 4;
+    [SerializeField] private int terrainHeightVariation = 4;
+    [SerializeField] private float terrainScale = 0.08f;
+    [SerializeField] private int seed = 12345;
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
 
     private void Start()
@@ -68,5 +72,17 @@ public class World : MonoBehaviour
         activeChunks.Add(chunkCoordinate, chunk);
 
         return chunk;
+    }
+
+    public int GetTerrainHeight(int globalX, int globalZ)
+    {
+        float noise = Mathf.PerlinNoise(
+            (globalX + seed) * terrainScale,
+            (globalZ + seed) * terrainScale
+        );
+
+        int height = baseTerrainHeight + Mathf.FloorToInt(noise * terrainHeightVariation);
+
+        return Mathf.Clamp(height, 1, VoxelData.ChunkHeight - 1);
     }
 }
