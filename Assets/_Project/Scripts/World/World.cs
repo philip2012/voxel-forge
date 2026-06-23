@@ -30,9 +30,6 @@ public class World : MonoBehaviour
         {
             activeChunk.Value.GenerateChunkMesh();
         }
-
-        int testHeight = GetTerrainHeight(0, 0);
-        SetBlock(new Vector3Int(0, testHeight, 0), BlockType.Air);
     }
 
     public BlockType GetBlock(Vector3Int globalPosition)
@@ -110,6 +107,32 @@ public class World : MonoBehaviour
         }
 
         chunk.SetVoxelFromLocalPosition(localX, globalPosition.y, localZ, blockType);
-        chunk.RefreshChunkMesh();
+        RefreshChunkAtCoordinate(chunkCoordinate);
+
+        if (localX == 0)
+        {
+            RefreshChunkAtCoordinate(chunkCoordinate + new Vector2Int(-1, 0));
+        }
+        else if (localX == VoxelData.ChunkWidth - 1)
+        {
+            RefreshChunkAtCoordinate(chunkCoordinate + new Vector2Int(1, 0));
+        }
+
+        if (localZ == 0)
+        {
+            RefreshChunkAtCoordinate(chunkCoordinate + new Vector2Int(0, -1));
+        }
+        else if (localZ == VoxelData.ChunkWidth - 1)
+        {
+            RefreshChunkAtCoordinate(chunkCoordinate + new Vector2Int(0, 1));
+        }
+    }
+
+    private void RefreshChunkAtCoordinate(Vector2Int chunkCoordinate)
+    {
+        if (activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+        {
+            chunk.RefreshChunkMesh();
+        }
     }
 }
