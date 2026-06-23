@@ -12,6 +12,7 @@ public class Chunk : MonoBehaviour
     private byte[] voxelMap = new byte[VoxelData.ChunkVoxelCount];
     private World world;
     private Vector2Int chunkCoordinate;
+    private Mesh mesh;
 
     private List<Vector3> vertices = new List<Vector3>();
     private List<int> triangles = new List<int>();
@@ -22,6 +23,14 @@ public class Chunk : MonoBehaviour
     {
         meshFilter = GetComponent<MeshFilter>();
         meshCollider = GetComponent<MeshCollider>();
+
+        mesh = new Mesh
+        {
+            name = "Chunk Mesh"
+        };
+        mesh.MarkDynamic();
+
+        meshFilter.sharedMesh = mesh;
     }
 
     public void Initialize(World world, Vector2Int chunkCoordinate)
@@ -206,7 +215,6 @@ public class Chunk : MonoBehaviour
         float vMin = textureTile.y * textureSize + padding;
         float uMax = (textureTile.x + 1) * textureSize - padding;
         float vMax = (textureTile.y + 1) * textureSize - padding;
-        
         uvs.Add(new Vector2(uMin, vMin));
         uvs.Add(new Vector2(uMin, vMax));
         uvs.Add(new Vector2(uMax, vMin));
@@ -215,16 +223,15 @@ public class Chunk : MonoBehaviour
     
     private void ApplyMesh()
     {
-        Mesh mesh = new Mesh
-        {
-            vertices = vertices.ToArray(),
-            triangles = triangles.ToArray(),
-            uv = uvs.ToArray(),
-        };
+        mesh.Clear();
+
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.SetUVs(0, uvs);
 
         mesh.RecalculateNormals();
 
-        meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = null;
         meshCollider.sharedMesh = mesh;
     }
 }
