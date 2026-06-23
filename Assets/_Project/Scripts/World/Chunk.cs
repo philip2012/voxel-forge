@@ -37,6 +37,11 @@ public class Chunk : MonoBehaviour
         GenerateMesh();
     }
 
+    public void RefreshChunkMesh()
+    {
+        GenerateMesh();
+    }
+
     public BlockType GetVoxelFromLocalPosition(int x, int y, int z)
     {
         if (!IsVoxelInsideChunk(x, y, z))
@@ -45,6 +50,16 @@ public class Chunk : MonoBehaviour
         }
 
         return GetVoxel(x, y, z);
+    }
+
+    public void SetVoxelFromLocalPosition(int x, int y, int z, BlockType blockType)
+    {
+        if (!IsVoxelInsideChunk(x, y, z))
+        {
+            return;
+        }
+
+        SetVoxel(x, y, z, blockType);
     }
 
     private int GetVoxelIndex(int x, int y, int z)

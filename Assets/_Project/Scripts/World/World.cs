@@ -30,6 +30,9 @@ public class World : MonoBehaviour
         {
             activeChunk.Value.GenerateChunkMesh();
         }
+
+        int testHeight = GetTerrainHeight(0, 0);
+        SetBlock(new Vector3Int(0, testHeight, 0), BlockType.Air);
     }
 
     public BlockType GetBlock(Vector3Int globalPosition)
@@ -84,5 +87,29 @@ public class World : MonoBehaviour
         int height = baseTerrainHeight + Mathf.FloorToInt(noise * terrainHeightVariation);
 
         return Mathf.Clamp(height, 1, VoxelData.ChunkHeight - 1);
+    }
+
+    public void SetBlock(Vector3Int globalPosition, BlockType blockType)
+    {
+        if (globalPosition.y < 0 || globalPosition.y >= VoxelData.ChunkHeight)
+        {
+            return;
+        }
+
+        int chunkX = Mathf.FloorToInt((float)globalPosition.x / VoxelData.ChunkWidth);
+        int chunkZ = Mathf.FloorToInt((float)globalPosition.z / VoxelData.ChunkWidth);
+
+        int localX = globalPosition.x - chunkX * VoxelData.ChunkWidth;
+        int localZ = globalPosition.z - chunkZ * VoxelData.ChunkWidth;
+
+        Vector2Int chunkCoordinate = new Vector2Int(chunkX, chunkZ);
+
+        if (!activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+        {
+            return;
+        }
+
+        chunk.SetVoxelFromLocalPosition(localX, globalPosition.y, localZ, blockType);
+        chunk.RefreshChunkMesh();
     }
 }
