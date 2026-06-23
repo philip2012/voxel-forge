@@ -6,6 +6,7 @@ public class PlayerInteraction : MonoBehaviour
     [SerializeField] private World world;
     [SerializeField] private Camera playerCamera;
     [SerializeField] private float interactionDistance = 12f;
+    [SerializeField] private BlockType blockToPlace = BlockType.Dirt;
 
     private void Awake()
     {
@@ -21,6 +22,11 @@ public class PlayerInteraction : MonoBehaviour
         {
             BreakBlock();
         }
+
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            PlaceBlock();
+        }
     }
 
     private void BreakBlock()
@@ -31,8 +37,19 @@ public class PlayerInteraction : MonoBehaviour
         {
             Vector3 blockPoint = hit.point - hit.normal * 0.01f;
             Vector3Int blockPosition = Vector3Int.FloorToInt(blockPoint);
-
             world.SetBlock(blockPosition, BlockType.Air);
+        }
+    }
+
+    private void PlaceBlock()
+    {
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+
+        if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance))
+        {
+            Vector3 blockPoint = hit.point + hit.normal * 0.01f;
+            Vector3Int blockPosition = Vector3Int.FloorToInt(blockPoint);
+            world.SetBlock(blockPosition, blockToPlace);
         }
     }
 }
