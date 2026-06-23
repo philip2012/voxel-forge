@@ -106,6 +106,11 @@ public class World : MonoBehaviour
             return;
         }
 
+        if (chunk.GetVoxelFromLocalPosition(localX, globalPosition.y, localZ) == blockType)
+        {
+            return;
+        }
+
         chunk.SetVoxelFromLocalPosition(localX, globalPosition.y, localZ, blockType);
         RefreshChunkAtCoordinate(chunkCoordinate);
 
