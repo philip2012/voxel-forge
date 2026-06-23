@@ -16,10 +16,15 @@ public class World : MonoBehaviour
             }
         }
 
-        Debug.Log(GetBlock(new Vector3Int(0, 4, 0)));
-        Debug.Log(GetBlock(new Vector3Int(16, 4, 0)));
-        Debug.Log(GetBlock(new Vector3Int(-1, 4, 0)));
-        Debug.Log(GetBlock(new Vector3Int(0, 10, 0)));
+        foreach (KeyValuePair<Vector2Int, Chunk> activeChunk in activeChunks)
+        {
+            activeChunk.Value.Initialize(this, activeChunk.Key);
+        }
+
+        foreach (KeyValuePair<Vector2Int, Chunk> activeChunk in activeChunks)
+        {
+            activeChunk.Value.GenerateChunkMesh();
+        }
     }
 
     public BlockType GetBlock(Vector3Int globalPosition)
@@ -60,7 +65,6 @@ public class World : MonoBehaviour
         Chunk chunk = Instantiate(chunkPrefab, worldPosition, Quaternion.identity, transform);
         chunk.name = $"Chunk ({chunkCoordinate.x}, {chunkCoordinate.y})";
         activeChunks.Add(chunkCoordinate, chunk);
-        chunk.Initialize(this, chunkCoordinate);
 
         return chunk;
     }

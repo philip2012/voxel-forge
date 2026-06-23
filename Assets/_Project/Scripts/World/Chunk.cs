@@ -30,6 +30,10 @@ public class Chunk : MonoBehaviour
         this.chunkCoordinate = chunkCoordinate;
 
         PopulateVoxelMap();
+    }
+
+    public void GenerateChunkMesh()
+    {
         GenerateMesh();
     }
 
@@ -120,12 +124,23 @@ public class Chunk : MonoBehaviour
 
     private bool CheckVoxel(int x, int y, int z)
     {
-        if (!IsVoxelInsideChunk(x, y, z))
+        BlockType blockType;
+
+        if (IsVoxelInsideChunk(x, y, z))
         {
-            return false;
+            blockType = GetVoxel(x, y, z);
         }
-        
-        BlockType blockType = GetVoxel(x, y, z);
+        else
+        {
+            Vector3Int globalPosition = new Vector3Int(
+                chunkCoordinate.x * VoxelData.ChunkWidth + x,
+                y,
+                chunkCoordinate.y * VoxelData.ChunkWidth + z
+            );
+
+            blockType = world.GetBlock(globalPosition);
+        }
+
         BlockData blockData = BlockDatabase.GetBlockData(blockType);
         return blockData.isSolid;
     }
