@@ -4,12 +4,13 @@ using System.Collections.Generic;
 public class World : MonoBehaviour
 {
     [SerializeField] private Chunk chunkPrefab;
-    [SerializeField, Min(0)] private int viewDistanceInChunks = 1;    
+    [SerializeField, Min(0)] private int viewDistanceInChunks = 1;
     [SerializeField] private int baseTerrainHeight = 4;
     [SerializeField] private int terrainHeightVariation = 4;
     [SerializeField] private float terrainScale = 0.08f;
     [SerializeField] private int seed = 12345;
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
+    private HashSet<Vector2Int> dirtyChunks = new HashSet<Vector2Int>();
 
     private void Start()
     {
@@ -30,6 +31,21 @@ public class World : MonoBehaviour
         {
             activeChunk.Value.GenerateChunkMesh();
         }
+    }
+
+    private void LateUpdate()
+    {
+        if (dirtyChunks.Count == 0)
+        {
+            return;
+        }
+
+        foreach (Vector2Int chunkCoordinate in dirtyChunks)
+        {
+            RefreshChunkAtCoordinate(chunkCoordinate);
+        }
+
+        dirtyChunks.Clear();
     }
 
     public BlockType GetBlock(Vector3Int globalPosition)
@@ -112,24 +128,24 @@ public class World : MonoBehaviour
         }
 
         chunk.SetVoxelFromLocalPosition(localX, globalPosition.y, localZ, blockType);
-        RefreshChunkAtCoordinate(chunkCoordinate);
+        MarkChunkDirty(chunkCoordinate);
 
         if (localX == 0)
         {
-            RefreshChunkAtCoordinate(chunkCoordinate + new Vector2Int(-1, 0));
+            MarkChunkDirty(chunkCoordinate + new Vector2Int(-1, 0));
         }
         else if (localX == VoxelData.ChunkWidth - 1)
         {
-            RefreshChunkAtCoordinate(chunkCoordinate + new Vector2Int(1, 0));
+            MarkChunkDirty(chunkCoordinate + new Vector2Int(1, 0));
         }
 
         if (localZ == 0)
         {
-            RefreshChunkAtCoordinate(chunkCoordinate + new Vector2Int(0, -1));
+            MarkChunkDirty(chunkCoordinate + new Vector2Int(0, -1));
         }
         else if (localZ == VoxelData.ChunkWidth - 1)
         {
-            RefreshChunkAtCoordinate(chunkCoordinate + new Vector2Int(0, 1));
+            MarkChunkDirty(chunkCoordinate + new Vector2Int(0, 1));
         }
     }
 
@@ -138,6 +154,14 @@ public class World : MonoBehaviour
         if (activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
         {
             chunk.RefreshChunkMesh();
+        }
+    }
+
+    private void MarkChunkDirty(Vector2Int chunkCoordinate)
+    {
+        if (activeChunks.ContainsKey(chunkCoordinate))
+        {
+            dirtyChunks.Add(chunkCoordinate);
         }
     }
 }
