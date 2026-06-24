@@ -5,14 +5,16 @@ public class World : MonoBehaviour
 {
     [SerializeField] private Chunk chunkPrefab;
     [SerializeField, Min(0)] private int viewDistanceInChunks = 1;
-    [SerializeField, Min(1)] private int maxChunkRefreshesPerFrame = 1;
+    [SerializeField, Min(1)] private int maxVisualChunkRefreshesPerFrame = 2;
+    [SerializeField, Min(1)] private int maxColliderChunkRefreshesPerFrame = 1;
     [SerializeField] private int baseTerrainHeight = 4;
     [SerializeField] private int terrainHeightVariation = 4;
     [SerializeField] private float terrainScale = 0.08f;
     [SerializeField] private int seed = 12345;
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
-    private HashSet<Vector2Int> dirtyChunks = new HashSet<Vector2Int>();
-    private List<Vector2Int> refreshedChunksThisFrame = new List<Vector2Int>();
+    private HashSet<Vector2Int> dirtyVisualChunks = new HashSet<Vector2Int>();
+    private HashSet<Vector2Int> dirtyColliderChunks = new HashSet<Vector2Int>();
+    private List<Vector2Int> processedChunksThisFrame = new List<Vector2Int>();
 
     private void Start()
     {
@@ -37,28 +39,18 @@ public class World : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (dirtyChunks.Count == 0)
-        {
-            return;
-        }
+        ProcessChunkRefreshQueue(
+            dirtyColliderChunks,
+            maxColliderChunkRefreshesPerFrame,
+            true,
+            dirtyVisualChunks
+        );
 
-        refreshedChunksThisFrame.Clear();
-
-        foreach (Vector2Int chunkCoordinate in dirtyChunks)
-        {
-            RefreshChunkAtCoordinate(chunkCoordinate);
-            refreshedChunksThisFrame.Add(chunkCoordinate);
-
-            if (refreshedChunksThisFrame.Count >= maxChunkRefreshesPerFrame)
-            {
-                break;
-            }
-        }
-
-        foreach (Vector2Int chunkCoordinate in refreshedChunksThisFrame)
-        {
-            dirtyChunks.Remove(chunkCoordinate);
-        }
+        ProcessChunkRefreshQueue(
+            dirtyVisualChunks,
+            maxVisualChunkRefreshesPerFrame,
+            false
+        );
     }
 
     public BlockType GetBlock(Vector3Int globalPosition)
@@ -174,7 +166,43 @@ public class World : MonoBehaviour
     {
         if (activeChunks.ContainsKey(chunkCoordinate))
         {
-            dirtyChunks.Add(chunkCoordinate);
+            dirtyVisualChunks.Add(chunkCoordinate);
+            dirtyColliderChunks.Add(chunkCoordinate);
+        }
+    }
+
+    private void ProcessChunkRefreshQueue(
+        HashSet<Vector2Int> dirtyChunks,
+        int maxRefreshes,
+        bool updateCollider,
+        HashSet<Vector2Int> alsoRemoveFrom = null)
+    {
+        if (dirtyChunks.Count == 0)
+        {
+            return;
+        }
+
+        processedChunksThisFrame.Clear();
+
+        foreach (Vector2Int chunkCoordinate in dirtyChunks)
+        {
+            if (activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+            {
+                chunk.RefreshChunkMesh(updateCollider);
+            }
+
+            processedChunksThisFrame.Add(chunkCoordinate);
+
+            if (processedChunksThisFrame.Count >= maxRefreshes)
+            {
+                break;
+            }
+        }
+
+        foreach (Vector2Int chunkCoordinate in processedChunksThisFrame)
+        {
+            dirtyChunks.Remove(chunkCoordinate);
+            alsoRemoveFrom?.Remove(chunkCoordinate);
         }
     }
 }
