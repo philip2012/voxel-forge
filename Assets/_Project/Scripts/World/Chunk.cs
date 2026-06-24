@@ -20,6 +20,7 @@ public class Chunk : MonoBehaviour
     private List<Vector3> vertices = new List<Vector3>(EstimatedVisibleFaceCount * 4);
     private List<int> triangles = new List<int>(EstimatedVisibleFaceCount * 6);
     private List<Vector2> uvs = new List<Vector2>(EstimatedVisibleFaceCount * 4);
+    private List<Vector3> normals = new List<Vector3>(EstimatedVisibleFaceCount * 4);
 
     private void Awake()
     {
@@ -128,6 +129,7 @@ public class Chunk : MonoBehaviour
         vertices.Clear();
         triangles.Clear();
         uvs.Clear();
+        normals.Clear();
 
         for (int x = 0; x < VoxelData.ChunkWidth; x++)
         {
@@ -155,7 +157,6 @@ public class Chunk : MonoBehaviour
                 }
             }
         }
-
         ApplyMesh();
     }
 
@@ -191,12 +192,14 @@ public class Chunk : MonoBehaviour
     {
         int vertexIndex = vertices.Count;
         Vector3 blockPosition = new Vector3(x, y, z);
+        Vector3 faceNormal = VoxelData.FaceChecks[faceIndex];
         for (int i = 0; i < 4; i++)
         {
             int cubeVertexIndex = VoxelData.VoxelTriangles[faceIndex, i];
             Vector3 cubeVertexPosition = VoxelData.VoxelVertices[cubeVertexIndex];
             Vector3 finalVertexPosition = blockPosition + cubeVertexPosition;
             vertices.Add(finalVertexPosition);
+            normals.Add(faceNormal);
         }
         triangles.Add(vertexIndex);
         triangles.Add(vertexIndex + 1);
@@ -231,7 +234,7 @@ public class Chunk : MonoBehaviour
         mesh.SetTriangles(triangles, 0);
         mesh.SetUVs(0, uvs);
 
-        mesh.RecalculateNormals();
+        mesh.SetNormals(normals);
 
         meshCollider.sharedMesh = null;
         meshCollider.sharedMesh = mesh;
