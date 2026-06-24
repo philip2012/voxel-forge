@@ -5,12 +5,14 @@ public class World : MonoBehaviour
 {
     [SerializeField] private Chunk chunkPrefab;
     [SerializeField, Min(0)] private int viewDistanceInChunks = 1;
+    [SerializeField, Min(1)] private int maxChunkRefreshesPerFrame = 1;
     [SerializeField] private int baseTerrainHeight = 4;
     [SerializeField] private int terrainHeightVariation = 4;
     [SerializeField] private float terrainScale = 0.08f;
     [SerializeField] private int seed = 12345;
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
     private HashSet<Vector2Int> dirtyChunks = new HashSet<Vector2Int>();
+    private List<Vector2Int> refreshedChunksThisFrame = new List<Vector2Int>();
 
     private void Start()
     {
@@ -40,12 +42,23 @@ public class World : MonoBehaviour
             return;
         }
 
+        refreshedChunksThisFrame.Clear();
+
         foreach (Vector2Int chunkCoordinate in dirtyChunks)
         {
             RefreshChunkAtCoordinate(chunkCoordinate);
+            refreshedChunksThisFrame.Add(chunkCoordinate);
+
+            if (refreshedChunksThisFrame.Count >= maxChunkRefreshesPerFrame)
+            {
+                break;
+            }
         }
 
-        dirtyChunks.Clear();
+        foreach (Vector2Int chunkCoordinate in refreshedChunksThisFrame)
+        {
+            dirtyChunks.Remove(chunkCoordinate);
+        }
     }
 
     public BlockType GetBlock(Vector3Int globalPosition)

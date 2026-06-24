@@ -399,6 +399,7 @@ MonoBehaviour:
   world: {fileID: 2118334475}
   playerCamera: {fileID: 0}
   interactionDistance: 6
+  blockToPlace: 3
 --- !u!1 &2118334474
 GameObject:
   m_ObjectHideFlags: 0
@@ -430,6 +431,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::World
   chunkPrefab: {fileID: 2345644168970911497, guid: aab50d376ac454a77b8778a69af2b0fd, type: 3}
   viewDistanceInChunks: 2
+  maxChunkRefreshesPerFrame: 1
   baseTerrainHeight: 4
   terrainHeightVariation: 4
   terrainScale: 0.08
