@@ -137,20 +137,32 @@ public class World : MonoBehaviour
 
         if (localX == 0)
         {
-            MarkChunkDirty(chunkCoordinate + new Vector2Int(-1, 0));
+            MarkNeighborChunkDirtyIfSolid(
+                chunkCoordinate + new Vector2Int(-1, 0),
+                globalPosition + new Vector3Int(-1, 0, 0)
+            );
         }
         else if (localX == VoxelData.ChunkWidth - 1)
         {
-            MarkChunkDirty(chunkCoordinate + new Vector2Int(1, 0));
+            MarkNeighborChunkDirtyIfSolid(
+                chunkCoordinate + new Vector2Int(1, 0),
+                globalPosition + new Vector3Int(1, 0, 0)
+            );
         }
 
         if (localZ == 0)
         {
-            MarkChunkDirty(chunkCoordinate + new Vector2Int(0, -1));
+            MarkNeighborChunkDirtyIfSolid(
+                chunkCoordinate + new Vector2Int(0, -1),
+                globalPosition + new Vector3Int(0, 0, -1)
+            );
         }
         else if (localZ == VoxelData.ChunkWidth - 1)
         {
-            MarkChunkDirty(chunkCoordinate + new Vector2Int(0, 1));
+            MarkNeighborChunkDirtyIfSolid(
+                chunkCoordinate + new Vector2Int(0, 1),
+                globalPosition + new Vector3Int(0, 0, 1)
+            );
         }
     }
 
@@ -203,6 +215,22 @@ public class World : MonoBehaviour
         {
             dirtyChunks.Remove(chunkCoordinate);
             alsoRemoveFrom?.Remove(chunkCoordinate);
+        }
+    }
+
+    private void MarkNeighborChunkDirtyIfSolid(Vector2Int neighborChunkCoordinate, Vector3Int neighborGlobalPosition)
+    {
+        if (!activeChunks.ContainsKey(neighborChunkCoordinate))
+        {
+            return;
+        }
+
+        BlockType neighborBlockType = GetBlock(neighborGlobalPosition);
+        BlockData neighborBlockData = BlockDatabase.GetBlockData(neighborBlockType);
+
+        if (neighborBlockData.isSolid)
+        {
+            MarkChunkDirty(neighborChunkCoordinate);
         }
     }
 }
