@@ -244,13 +244,23 @@ public class Chunk : MonoBehaviour
 
         if (updateCollider)
         {
-            colliderMesh.Clear();
-
-            colliderMesh.SetVertices(vertices);
-            colliderMesh.SetTriangles(triangles, 0);
-
-            meshCollider.sharedMesh = null;
-            meshCollider.sharedMesh = colliderMesh;
+            UpdateColliderMesh();
         }
+    }
+
+    private void UpdateColliderMesh()
+    {
+        colliderMesh.Clear();
+
+        colliderMesh.SetVertices(vertices);
+        colliderMesh.SetTriangles(triangles, 0);
+
+        meshCollider.sharedMesh = null;
+        meshCollider.sharedMesh = colliderMesh;
+    }
+
+    public void RefreshColliderOnly()
+    {
+        UpdateColliderMesh();
     }
 }

@@ -39,18 +39,8 @@ public class World : MonoBehaviour
 
     private void LateUpdate()
     {
-        ProcessChunkRefreshQueue(
-            dirtyColliderChunks,
-            maxColliderChunkRefreshesPerFrame,
-            true,
-            dirtyVisualChunks
-        );
-
-        ProcessChunkRefreshQueue(
-            dirtyVisualChunks,
-            maxVisualChunkRefreshesPerFrame,
-            false
-        );
+        ProcessVisualRefreshQueue();
+        ProcessColliderRefreshQueue();
     }
 
     public BlockType GetBlock(Vector3Int globalPosition)
@@ -183,41 +173,6 @@ public class World : MonoBehaviour
         }
     }
 
-    private void ProcessChunkRefreshQueue(
-        HashSet<Vector2Int> dirtyChunks,
-        int maxRefreshes,
-        bool updateCollider,
-        HashSet<Vector2Int> alsoRemoveFrom = null)
-    {
-        if (dirtyChunks.Count == 0)
-        {
-            return;
-        }
-
-        processedChunksThisFrame.Clear();
-
-        foreach (Vector2Int chunkCoordinate in dirtyChunks)
-        {
-            if (activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
-            {
-                chunk.RefreshChunkMesh(updateCollider);
-            }
-
-            processedChunksThisFrame.Add(chunkCoordinate);
-
-            if (processedChunksThisFrame.Count >= maxRefreshes)
-            {
-                break;
-            }
-        }
-
-        foreach (Vector2Int chunkCoordinate in processedChunksThisFrame)
-        {
-            dirtyChunks.Remove(chunkCoordinate);
-            alsoRemoveFrom?.Remove(chunkCoordinate);
-        }
-    }
-
     private void MarkNeighborChunkDirtyIfSolid(Vector2Int neighborChunkCoordinate, Vector3Int neighborGlobalPosition)
     {
         if (!activeChunks.ContainsKey(neighborChunkCoordinate))
@@ -231,6 +186,71 @@ public class World : MonoBehaviour
         if (neighborBlockData.isSolid)
         {
             MarkChunkDirty(neighborChunkCoordinate);
+        }
+    }
+
+    private void ProcessVisualRefreshQueue()
+    {
+        if (dirtyVisualChunks.Count == 0)
+        {
+            return;
+        }
+
+        processedChunksThisFrame.Clear();
+
+        foreach (Vector2Int chunkCoordinate in dirtyVisualChunks)
+        {
+            if (activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+            {
+                chunk.RefreshChunkMesh(false);
+            }
+
+            processedChunksThisFrame.Add(chunkCoordinate);
+
+            if (processedChunksThisFrame.Count >= maxVisualChunkRefreshesPerFrame)
+            {
+                break;
+            }
+        }
+
+        foreach (Vector2Int chunkCoordinate in processedChunksThisFrame)
+        {
+            dirtyVisualChunks.Remove(chunkCoordinate);
+        }
+    }
+
+    private void ProcessColliderRefreshQueue()
+    {
+        if (dirtyColliderChunks.Count == 0)
+        {
+            return;
+        }
+
+        processedChunksThisFrame.Clear();
+
+        foreach (Vector2Int chunkCoordinate in dirtyColliderChunks)
+        {
+            if (dirtyVisualChunks.Contains(chunkCoordinate))
+            {
+                continue;
+            }
+
+            if (activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+            {
+                chunk.RefreshColliderOnly();
+            }
+
+            processedChunksThisFrame.Add(chunkCoordinate);
+
+            if (processedChunksThisFrame.Count >= maxColliderChunkRefreshesPerFrame)
+            {
+                break;
+            }
+        }
+
+        foreach (Vector2Int chunkCoordinate in processedChunksThisFrame)
+        {
+            dirtyColliderChunks.Remove(chunkCoordinate);
         }
     }
 }
