@@ -8,6 +8,17 @@ public class PlayerInteraction : MonoBehaviour
     [SerializeField] private float interactionDistance = 12f;
     [SerializeField] private BlockType blockToPlace = BlockType.Dirt;
 
+    [SerializeField] private BlockType[] placeableBlocks =
+    {
+        BlockType.Dirt,
+        BlockType.Stone,
+        BlockType.Grass,
+        BlockType.Wood,
+        BlockType.Leaves
+    };
+
+    private int selectedBlockIndex;
+
     private void Awake()
     {
         if (playerCamera == null)
@@ -18,6 +29,8 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
+        HandleBlockSelection();
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             BreakBlock();
@@ -51,5 +64,42 @@ public class PlayerInteraction : MonoBehaviour
             Vector3Int blockPosition = Vector3Int.FloorToInt(blockPoint);
             world.SetBlock(blockPosition, blockToPlace);
         }
+    }
+
+    private void HandleBlockSelection()
+    {
+        if (Keyboard.current.digit1Key.wasPressedThisFrame)
+        {
+            SelectBlock(0);
+        }
+        else if (Keyboard.current.digit2Key.wasPressedThisFrame)
+        {
+            SelectBlock(1);
+        }
+        else if (Keyboard.current.digit3Key.wasPressedThisFrame)
+        {
+            SelectBlock(2);
+        }
+        else if (Keyboard.current.digit4Key.wasPressedThisFrame)
+        {
+            SelectBlock(3);
+        }
+        else if (Keyboard.current.digit5Key.wasPressedThisFrame)
+        {
+            SelectBlock(4);
+        }
+    }
+
+    private void SelectBlock(int index)
+    {
+        if (index < 0 || index >= placeableBlocks.Length)
+        {
+            return;
+        }
+
+        selectedBlockIndex = index;
+        blockToPlace = placeableBlocks[selectedBlockIndex];
+
+        Debug.Log($"Selected block: {blockToPlace}");
     }
 }
