@@ -166,7 +166,7 @@ public class World : MonoBehaviour
     {
         if (activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
         {
-            chunk.RefreshChunkMesh();
+            chunk.RefreshChunkMesh(true);
         }
     }
 

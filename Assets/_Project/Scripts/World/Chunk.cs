@@ -49,9 +49,9 @@ public class Chunk : MonoBehaviour
         GenerateMesh();
     }
 
-    public void RefreshChunkMesh()
+    public void RefreshChunkMesh(bool updateCollider = true)
     {
-        GenerateMesh();
+        GenerateMesh(updateCollider);
     }
 
     public BlockType GetVoxelFromLocalPosition(int x, int y, int z)
@@ -124,7 +124,7 @@ public class Chunk : MonoBehaviour
         }
     }
 
-    private void GenerateMesh()
+    private void GenerateMesh(bool updateCollider = true)
     {
         vertices.Clear();
         triangles.Clear();
@@ -157,7 +157,7 @@ public class Chunk : MonoBehaviour
                 }
             }
         }
-        ApplyMesh();
+        ApplyMesh(updateCollider);
     }
 
     private bool IsVoxelInsideChunk(int x, int y, int z)
@@ -226,7 +226,7 @@ public class Chunk : MonoBehaviour
         uvs.Add(new Vector2(uMax, vMax));
     }
     
-    private void ApplyMesh()
+    private void ApplyMesh(bool updateCollider)
     {
         mesh.Clear();
 
@@ -236,7 +236,10 @@ public class Chunk : MonoBehaviour
 
         mesh.SetNormals(normals);
 
-        meshCollider.sharedMesh = null;
-        meshCollider.sharedMesh = mesh;
+        if (updateCollider)
+        {
+            meshCollider.sharedMesh = null;
+            meshCollider.sharedMesh = mesh;
+        }
     }
 }
