@@ -473,7 +473,8 @@ MonoBehaviour:
   characterController: {fileID: 1882910948}
   cameraTransform: {fileID: 1342417684}
   moveSpeed: 6
-  mouseSensitivity: 0.1
+  mouseSensitivity: 0.2
+  jumpHeight: 1.2
   gravity: -20
 --- !u!4 &1882910950
 Transform:

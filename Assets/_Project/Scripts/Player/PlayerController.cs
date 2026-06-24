@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private float moveSpeed = 6f;
-    [SerializeField] private float mouseSensitivity = 0.1f;
+    [SerializeField] private float mouseSensitivity = 0.2f;
     [SerializeField] private float jumpHeight = 1.2f;
     [SerializeField] private float gravity = -20f;
 
