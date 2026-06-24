@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float mouseSensitivity = 0.2f;
     [SerializeField] private float jumpHeight = 1.2f;
     [SerializeField] private float gravity = -20f;
+    [SerializeField] private float sprintMultiplier = 1.6f;
 
     private float cameraPitch;
     private float verticalVelocity;
@@ -93,7 +94,14 @@ public class PlayerController : MonoBehaviour
 
         verticalVelocity += gravity * Time.deltaTime;
 
-        Vector3 velocity = moveDirection * moveSpeed;
+        float currentMoveSpeed = moveSpeed;
+
+        if (Keyboard.current.leftShiftKey.isPressed)
+        {
+            currentMoveSpeed *= sprintMultiplier;
+        }
+
+        Vector3 velocity = moveDirection * currentMoveSpeed;
         velocity.y = verticalVelocity;
 
         characterController.Move(velocity * Time.deltaTime);
