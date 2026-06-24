@@ -14,10 +14,12 @@ public class Chunk : MonoBehaviour
     private Vector2Int chunkCoordinate;
     private Mesh mesh;
 
-    private List<Vector3> vertices = new List<Vector3>();
-    private List<int> triangles = new List<int>();
+    private const int EstimatedVisibleFacesPerColumn = 6;
+    private const int EstimatedVisibleFaceCount = VoxelData.ChunkWidth * VoxelData.ChunkWidth * EstimatedVisibleFacesPerColumn;
 
-    private List<Vector2> uvs = new List<Vector2>();
+    private List<Vector3> vertices = new List<Vector3>(EstimatedVisibleFaceCount * 4);
+    private List<int> triangles = new List<int>(EstimatedVisibleFaceCount * 6);
+    private List<Vector2> uvs = new List<Vector2>(EstimatedVisibleFaceCount * 4);
 
     private void Awake()
     {
