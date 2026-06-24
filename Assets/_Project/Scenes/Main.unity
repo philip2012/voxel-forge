@@ -259,6 +259,7 @@ GameObject:
   - component: {fileID: 1342417682}
   - component: {fileID: 1342417685}
   - component: {fileID: 1342417686}
+  - component: {fileID: 1342417687}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -400,6 +401,20 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   interactionDistance: 6
   blockToPlace: 3
+--- !u!114 &1342417687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342417681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b01405b1b19cd4ae096bae8be8714679, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Crosshair
+  size: 12
+  thickness: 2
 --- !u!1 &2118334474
 GameObject:
   m_ObjectHideFlags: 0
@@ -431,7 +446,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::World
   chunkPrefab: {fileID: 2345644168970911497, guid: aab50d376ac454a77b8778a69af2b0fd, type: 3}
   viewDistanceInChunks: 2
-  maxChunkRefreshesPerFrame: 1
+  maxVisualChunkRefreshesPerFrame: 2
+  maxColliderChunkRefreshesPerFrame: 1
   baseTerrainHeight: 4
   terrainHeightVariation: 4
   terrainScale: 0.08
