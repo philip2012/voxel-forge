@@ -12,7 +12,8 @@ public class Chunk : MonoBehaviour
     private byte[] voxelMap = new byte[VoxelData.ChunkVoxelCount];
     private World world;
     private Vector2Int chunkCoordinate;
-    private Mesh mesh;
+    private Mesh visualMesh;
+    private Mesh colliderMesh;
 
     private const int EstimatedVisibleFacesPerColumn = 6;
     private const int EstimatedVisibleFaceCount = VoxelData.ChunkWidth * VoxelData.ChunkWidth * EstimatedVisibleFacesPerColumn;
@@ -27,13 +28,19 @@ public class Chunk : MonoBehaviour
         meshFilter = GetComponent<MeshFilter>();
         meshCollider = GetComponent<MeshCollider>();
 
-        mesh = new Mesh
+        visualMesh = new Mesh
         {
-            name = "Chunk Mesh"
+            name = "Chunk Visual Mesh"
         };
-        mesh.MarkDynamic();
+        visualMesh.MarkDynamic();
 
-        meshFilter.sharedMesh = mesh;
+        colliderMesh = new Mesh
+        {
+            name = "Chunk Collider Mesh"
+        };
+        colliderMesh.MarkDynamic();
+
+        meshFilter.sharedMesh = visualMesh;
     }
 
     public void Initialize(World world, Vector2Int chunkCoordinate)
@@ -228,18 +235,22 @@ public class Chunk : MonoBehaviour
     
     private void ApplyMesh(bool updateCollider)
     {
-        mesh.Clear();
+        visualMesh.Clear();
 
-        mesh.SetVertices(vertices);
-        mesh.SetTriangles(triangles, 0);
-        mesh.SetUVs(0, uvs);
-
-        mesh.SetNormals(normals);
+        visualMesh.SetVertices(vertices);
+        visualMesh.SetTriangles(triangles, 0);
+        visualMesh.SetUVs(0, uvs);
+        visualMesh.SetNormals(normals);
 
         if (updateCollider)
         {
+            colliderMesh.Clear();
+
+            colliderMesh.SetVertices(vertices);
+            colliderMesh.SetTriangles(triangles, 0);
+
             meshCollider.sharedMesh = null;
-            meshCollider.sharedMesh = mesh;
+            meshCollider.sharedMesh = colliderMesh;
         }
     }
 }
