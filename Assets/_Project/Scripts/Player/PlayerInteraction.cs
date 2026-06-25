@@ -7,6 +7,7 @@ public class PlayerInteraction : MonoBehaviour
     [SerializeField] private Camera playerCamera;
     [SerializeField] private float interactionDistance = 12f;
     [SerializeField] private BlockType blockToPlace = BlockType.Dirt;
+    public BlockType SelectedBlock => blockToPlace;
 
     [SerializeField] private BlockType[] placeableBlocks =
     {
@@ -99,7 +100,5 @@ public class PlayerInteraction : MonoBehaviour
 
         selectedBlockIndex = index;
         blockToPlace = placeableBlocks[selectedBlockIndex];
-
-        Debug.Log($"Selected block: {blockToPlace}");
     }
 }

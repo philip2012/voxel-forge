@@ -260,6 +260,7 @@ GameObject:
   - component: {fileID: 1342417685}
   - component: {fileID: 1342417686}
   - component: {fileID: 1342417687}
+  - component: {fileID: 1342417688}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -401,6 +402,7 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   interactionDistance: 12
   blockToPlace: 3
+  placeableBlocks: 0302040506
 --- !u!114 &1342417687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,6 +417,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Crosshair
   size: 12
   thickness: 2
+--- !u!114 &1342417688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342417681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abc6f68289b274449aa392a1e857a160, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectedBlockDisplay
+  playerInteraction: {fileID: 1342417686}
 --- !u!1 &1882910947
 GameObject:
   m_ObjectHideFlags: 0
