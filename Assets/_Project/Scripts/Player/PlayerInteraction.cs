@@ -89,6 +89,17 @@ public class PlayerInteraction : MonoBehaviour
         {
             SelectBlock(4);
         }
+
+        float scrollY = Mouse.current.scroll.ReadValue().y;
+
+        if (scrollY > 0f)
+        {
+            SelectNextBlock(1);
+        }
+        else if (scrollY < 0f)
+        {
+            SelectNextBlock(-1);
+        }
     }
 
     private void SelectBlock(int index)
@@ -100,5 +111,26 @@ public class PlayerInteraction : MonoBehaviour
 
         selectedBlockIndex = index;
         blockToPlace = placeableBlocks[selectedBlockIndex];
+    }
+
+    private void SelectNextBlock(int direction)
+    {
+        if (placeableBlocks.Length == 0)
+        {
+            return;
+        }
+
+        int newIndex = selectedBlockIndex + direction;
+
+        if (newIndex >= placeableBlocks.Length)
+        {
+            newIndex = 0;
+        }
+        else if (newIndex < 0)
+        {
+            newIndex = placeableBlocks.Length - 1;
+        }
+
+        SelectBlock(newIndex);
     }
 }
