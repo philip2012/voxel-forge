@@ -14,6 +14,7 @@ public class Chunk : MonoBehaviour
     private Vector2Int chunkCoordinate;
     private Mesh visualMesh;
     private Mesh colliderMesh;
+    private Bounds chunkMeshBounds;
 
     private const int EstimatedVisibleFacesPerColumn = 6;
     private const int EstimatedVisibleFaceCount = VoxelData.ChunkWidth * VoxelData.ChunkWidth * EstimatedVisibleFacesPerColumn;
@@ -41,6 +42,19 @@ public class Chunk : MonoBehaviour
         colliderMesh.MarkDynamic();
 
         meshFilter.sharedMesh = visualMesh;
+
+        chunkMeshBounds = new Bounds(
+            new Vector3(
+                VoxelData.ChunkWidth / 2f,
+                VoxelData.ChunkHeight / 2f,
+                VoxelData.ChunkWidth / 2f
+            ),
+            new Vector3(
+                VoxelData.ChunkWidth,
+                VoxelData.ChunkHeight,
+                VoxelData.ChunkWidth
+            )
+        );
     }
 
     public void Initialize(World world, Vector2Int chunkCoordinate)
@@ -238,7 +252,8 @@ public class Chunk : MonoBehaviour
         visualMesh.Clear();
 
         visualMesh.SetVertices(vertices);
-        visualMesh.SetTriangles(triangles, 0);
+        visualMesh.SetTriangles(triangles, 0, false);
+        visualMesh.bounds = chunkMeshBounds;
         visualMesh.SetUVs(0, uvs);
         visualMesh.SetNormals(normals);
 
@@ -253,7 +268,8 @@ public class Chunk : MonoBehaviour
         colliderMesh.Clear();
 
         colliderMesh.SetVertices(vertices);
-        colliderMesh.SetTriangles(triangles, 0);
+        colliderMesh.SetTriangles(triangles, 0, false);
+        colliderMesh.bounds = chunkMeshBounds;
 
         meshCollider.sharedMesh = null;
         meshCollider.sharedMesh = colliderMesh;

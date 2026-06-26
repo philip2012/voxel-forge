@@ -121,26 +121,35 @@ public class World : MonoBehaviour
             return;
         }
 
-        if (chunk.GetVoxelFromLocalPosition(localX, globalPosition.y, localZ) == blockType)
+        BlockType oldBlockType = chunk.GetVoxelFromLocalPosition(localX, globalPosition.y, localZ);
+
+        if (oldBlockType == blockType)
         {
             return;
         }
 
+        BlockData oldBlockData = BlockDatabase.GetBlockData(oldBlockType);
+        BlockData newBlockData = BlockDatabase.GetBlockData(blockType);
+
+        bool colliderChanged = oldBlockData.isSolid != newBlockData.isSolid;
+
         chunk.SetVoxelFromLocalPosition(localX, globalPosition.y, localZ, blockType);
-        MarkChunkDirty(chunkCoordinate);
+        MarkChunkDirty(chunkCoordinate, colliderChanged);
 
         if (localX == 0)
         {
             MarkNeighborChunkDirtyIfSolid(
                 chunkCoordinate + new Vector2Int(-1, 0),
-                globalPosition + new Vector3Int(-1, 0, 0)
+                globalPosition + new Vector3Int(-1, 0, 0),
+                colliderChanged
             );
         }
         else if (localX == VoxelData.ChunkWidth - 1)
         {
             MarkNeighborChunkDirtyIfSolid(
                 chunkCoordinate + new Vector2Int(1, 0),
-                globalPosition + new Vector3Int(1, 0, 0)
+                globalPosition + new Vector3Int(1, 0, 0),
+                colliderChanged
             );
         }
 
@@ -148,36 +157,39 @@ public class World : MonoBehaviour
         {
             MarkNeighborChunkDirtyIfSolid(
                 chunkCoordinate + new Vector2Int(0, -1),
-                globalPosition + new Vector3Int(0, 0, -1)
+                globalPosition + new Vector3Int(0, 0, -1),
+                colliderChanged
             );
         }
         else if (localZ == VoxelData.ChunkWidth - 1)
         {
             MarkNeighborChunkDirtyIfSolid(
                 chunkCoordinate + new Vector2Int(0, 1),
-                globalPosition + new Vector3Int(0, 0, 1)
+                globalPosition + new Vector3Int(0, 0, 1),
+                colliderChanged
             );
         }
     }
 
-    private void RefreshChunkAtCoordinate(Vector2Int chunkCoordinate)
+    private void MarkChunkDirty(Vector2Int chunkCoordinate, bool updateCollider)
     {
-        if (activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+        if (!activeChunks.ContainsKey(chunkCoordinate))
         {
-            chunk.RefreshChunkMesh(true);
+            return;
         }
-    }
 
-    private void MarkChunkDirty(Vector2Int chunkCoordinate)
-    {
-        if (activeChunks.ContainsKey(chunkCoordinate))
+        dirtyVisualChunks.Add(chunkCoordinate);
+
+        if (updateCollider)
         {
-            dirtyVisualChunks.Add(chunkCoordinate);
             dirtyColliderChunks.Add(chunkCoordinate);
         }
     }
 
-    private void MarkNeighborChunkDirtyIfSolid(Vector2Int neighborChunkCoordinate, Vector3Int neighborGlobalPosition)
+    private void MarkNeighborChunkDirtyIfSolid(
+        Vector2Int neighborChunkCoordinate,
+        Vector3Int neighborGlobalPosition,
+        bool updateCollider)
     {
         if (!activeChunks.ContainsKey(neighborChunkCoordinate))
         {
@@ -189,7 +201,7 @@ public class World : MonoBehaviour
 
         if (neighborBlockData.isSolid)
         {
-            MarkChunkDirty(neighborChunkCoordinate);
+            MarkChunkDirty(neighborChunkCoordinate, updateCollider);
         }
     }
 
