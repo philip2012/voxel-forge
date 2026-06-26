@@ -11,6 +11,8 @@ public class World : MonoBehaviour
     [SerializeField] private int terrainHeightVariation = 4;
     [SerializeField] private float terrainScale = 0.08f;
     [SerializeField] private int seed = 12345;
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Vector2Int playerSpawnXZ = Vector2Int.zero;
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
     private HashSet<Vector2Int> dirtyVisualChunks = new HashSet<Vector2Int>();
     private HashSet<Vector2Int> dirtyColliderChunks = new HashSet<Vector2Int>();
@@ -35,6 +37,8 @@ public class World : MonoBehaviour
         {
             activeChunk.Value.GenerateChunkMesh();
         }
+
+        SpawnPlayerOnTerrain();
     }
 
     private void LateUpdate()
@@ -252,5 +256,21 @@ public class World : MonoBehaviour
         {
             dirtyColliderChunks.Remove(chunkCoordinate);
         }
+    }
+
+    private void SpawnPlayerOnTerrain()
+    {
+        if (playerTransform == null)
+        {
+            return;
+        }
+
+        int terrainHeight = GetTerrainHeight(playerSpawnXZ.x, playerSpawnXZ.y);
+
+        playerTransform.position = new Vector3(
+            playerSpawnXZ.x + 0.5f,
+            terrainHeight + 1f,
+            playerSpawnXZ.y + 0.5f
+        );
     }
 }

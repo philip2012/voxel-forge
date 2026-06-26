@@ -402,6 +402,7 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   interactionDistance: 12
   blockToPlace: 3
+  characterController: {fileID: 0}
   placeableBlocks: 0302040506
 --- !u!114 &1342417687
 MonoBehaviour:
@@ -545,6 +546,8 @@ MonoBehaviour:
   terrainHeightVariation: 4
   terrainScale: 0.08
   seed: 12345
+  playerTransform: {fileID: 1882910950}
+  playerSpawnXZ: {x: 0, y: 0}
 --- !u!4 &2118334476
 Transform:
   m_ObjectHideFlags: 0
