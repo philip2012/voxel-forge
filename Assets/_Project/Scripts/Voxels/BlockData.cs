@@ -6,6 +6,7 @@ public struct BlockData
 {
     public string name;
     public bool isSolid;
+    public bool isBreakable;
     public Vector2Int topTexture;
     public Vector2Int bottomTexture;
     public Vector2Int sideTexture;

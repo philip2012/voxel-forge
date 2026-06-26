@@ -9,6 +9,7 @@ public static class BlockDatabase
         new() {
             name = "Air",
             isSolid = false,
+            isBreakable = false,
             topTexture = new Vector2Int(0, 0),
             bottomTexture = new Vector2Int(0, 0),
             sideTexture = new Vector2Int(0, 0),
@@ -16,6 +17,7 @@ public static class BlockDatabase
         new() {
             name = "Bedrock",
             isSolid = true,
+            isBreakable = false,
             topTexture = new Vector2Int(1, 0),
             bottomTexture = new Vector2Int(1, 0),
             sideTexture = new Vector2Int(1, 0),
@@ -23,6 +25,7 @@ public static class BlockDatabase
         new() {
             name = "Stone",
             isSolid = true,
+            isBreakable = true,
             topTexture = new Vector2Int(2, 0),
             bottomTexture = new Vector2Int(2, 0),
             sideTexture = new Vector2Int(2, 0),
@@ -30,6 +33,7 @@ public static class BlockDatabase
         new() {
             name = "Dirt",
             isSolid = true,
+            isBreakable = true,
             topTexture = new Vector2Int(3, 0),
             bottomTexture = new Vector2Int(3, 0),
             sideTexture = new Vector2Int(3, 0),
@@ -37,6 +41,7 @@ public static class BlockDatabase
         new() {
             name = "Grass",
             isSolid = true,
+            isBreakable = true,
             topTexture = new Vector2Int(4, 0),
             bottomTexture = new Vector2Int(3, 0),
             sideTexture = new Vector2Int(5, 0),
@@ -44,6 +49,7 @@ public static class BlockDatabase
         new() {
             name = "Wood",
             isSolid = true,
+            isBreakable = true,
             topTexture = new Vector2Int(6, 0),
             bottomTexture = new Vector2Int(6, 0),
             sideTexture = new Vector2Int(7, 0),
@@ -51,6 +57,7 @@ public static class BlockDatabase
         new() {
             name = "Leaves",
             isSolid = true,
+            isBreakable = true,
             topTexture = new Vector2Int(8, 0),
             bottomTexture = new Vector2Int(8, 0),
             sideTexture = new Vector2Int(8, 0),

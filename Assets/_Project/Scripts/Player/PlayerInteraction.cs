@@ -57,6 +57,12 @@ public class PlayerInteraction : MonoBehaviour
         {
             Vector3 blockPoint = hit.point - hit.normal * 0.01f;
             Vector3Int blockPosition = Vector3Int.FloorToInt(blockPoint);
+            BlockType blockType = world.GetBlock(blockPosition);
+            BlockData blockData = BlockDatabase.GetBlockData(blockType);
+            if (!blockData.isBreakable)
+            {
+                return;
+            }
             world.SetBlock(blockPosition, BlockType.Air);
         }
     }
