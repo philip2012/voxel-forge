@@ -36,6 +36,11 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            return;
+        }
+        
         HandleBlockSelection();
 
         if (Mouse.current.leftButton.wasPressedThisFrame)

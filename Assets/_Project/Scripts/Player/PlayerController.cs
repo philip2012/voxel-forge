@@ -26,12 +26,24 @@ public class PlayerController : MonoBehaviour
             cameraTransform = Camera.main.transform;
         }
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        LockCursor();
     }
 
     private void Update()
     {
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            UnlockCursor();
+        }
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                LockCursor();
+            }
+
+            return;
+        }
         HandleMouseLook();
         HandleMovement();
     }
@@ -105,5 +117,17 @@ public class PlayerController : MonoBehaviour
         velocity.y = verticalVelocity;
 
         characterController.Move(velocity * Time.deltaTime);
+    }
+
+    private void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    private void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }
