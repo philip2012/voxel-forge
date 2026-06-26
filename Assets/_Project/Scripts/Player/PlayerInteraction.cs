@@ -8,6 +8,7 @@ public class PlayerInteraction : MonoBehaviour
     [SerializeField] private float interactionDistance = 12f;
     [SerializeField] private BlockType blockToPlace = BlockType.Dirt;
     public BlockType SelectedBlock => blockToPlace;
+    [SerializeField] private CharacterController characterController;
 
     [SerializeField] private BlockType[] placeableBlocks =
     {
@@ -25,6 +26,11 @@ public class PlayerInteraction : MonoBehaviour
         if (playerCamera == null)
         {
             playerCamera = Camera.main;
+        }
+
+        if (characterController == null)
+        {
+            characterController = GetComponentInParent<CharacterController>();
         }
     }
 
@@ -63,6 +69,10 @@ public class PlayerInteraction : MonoBehaviour
         {
             Vector3 blockPoint = hit.point + hit.normal * 0.01f;
             Vector3Int blockPosition = Vector3Int.FloorToInt(blockPoint);
+            if (IsBlockOverlappingPlayer(blockPosition))
+            {
+                return;
+            }
             world.SetBlock(blockPosition, blockToPlace);
         }
     }
@@ -132,5 +142,20 @@ public class PlayerInteraction : MonoBehaviour
         }
 
         SelectBlock(newIndex);
+    }
+
+    private bool IsBlockOverlappingPlayer(Vector3Int blockPosition)
+    {
+        if (characterController == null)
+        {
+            return false;
+        }
+
+        Bounds blockBounds = new Bounds(
+            blockPosition + Vector3.one * 0.5f,
+            Vector3.one
+        );
+
+        return characterController.bounds.Intersects(blockBounds);
     }
 }
