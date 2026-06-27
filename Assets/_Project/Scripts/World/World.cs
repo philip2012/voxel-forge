@@ -136,6 +136,11 @@ public class World : MonoBehaviour
         chunk.SetVoxelFromLocalPosition(localX, globalPosition.y, localZ, blockType);
         MarkChunkDirty(chunkCoordinate, colliderChanged);
 
+        if (!colliderChanged)
+        {
+            return;
+        }
+
         if (localX == 0)
         {
             MarkNeighborChunkDirtyIfSolid(
