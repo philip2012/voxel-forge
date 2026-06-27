@@ -198,6 +198,9 @@ public class Chunk : MonoBehaviour
                 TryGenerateTree(x, terrainHeight, z, globalX, globalZ);
             }
         }
+
+        // Pass 3: save player edits
+        ApplySavedBlocks();
     }
 
     private void GenerateMesh(bool updateCollider = true)
@@ -417,6 +420,29 @@ public class Chunk : MonoBehaviour
                     }
 
                     SetVoxel(leafX, leafY, leafZ, BlockType.Leaves);
+                }
+            }
+        }
+    }
+
+    private void ApplySavedBlocks()
+    {
+        for (int z = 0; z < VoxelData.ChunkWidth; z++)
+        {
+            for (int y = 0; y < VoxelData.ChunkHeight; y++)
+            {
+                for (int x = 0; x < VoxelData.ChunkWidth; x++)
+                {
+                    Vector3Int globalPosition = new Vector3Int(
+                        chunkOriginX + x,
+                        y,
+                        chunkOriginZ + z
+                    );
+
+                    if (world.TryGetModifiedBlock(globalPosition, out BlockType savedBlockType))
+                    {
+                        SetVoxel(x, y, z, savedBlockType);
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@ public class World : MonoBehaviour
     [SerializeField] private Vector2Int playerSpawnXZ = Vector2Int.zero;
     [SerializeField, Range(0, 20)] private int treeChancePercent = 1;
     private Vector2Int currentPlayerChunkCoordinate = new Vector2Int(int.MinValue, int.MinValue);
+    private Dictionary<Vector3Int, BlockType> modifiedBlocks = new Dictionary<Vector3Int, BlockType>();
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
     private HashSet<Vector2Int> dirtyVisualChunks = new HashSet<Vector2Int>();
     private HashSet<Vector2Int> dirtyColliderChunks = new HashSet<Vector2Int>();
@@ -163,6 +164,7 @@ public class World : MonoBehaviour
         bool colliderChanged = oldBlockIsSolid != newBlockIsSolid;
 
         chunk.SetVoxelFromLocalPosition(localX, globalPosition.y, localZ, blockType);
+        modifiedBlocks[globalPosition] = blockType;
         MarkChunkDirty(chunkCoordinate, colliderChanged);
 
         if (!colliderChanged)
@@ -411,5 +413,10 @@ public class World : MonoBehaviour
         int distanceZ = Mathf.Abs(chunkCoordinate.y - currentPlayerChunkCoordinate.y);
 
         return distanceX <= viewDistanceInChunks && distanceZ <= viewDistanceInChunks;
+    }
+
+    public bool TryGetModifiedBlock(Vector3Int globalPosition, out BlockType blockType)
+    {
+        return modifiedBlocks.TryGetValue(globalPosition, out blockType);
     }
 }
