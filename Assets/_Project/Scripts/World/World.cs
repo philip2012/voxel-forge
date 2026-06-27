@@ -13,6 +13,7 @@ public class World : MonoBehaviour
     [SerializeField] private int seed = 12345;
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Vector2Int playerSpawnXZ = Vector2Int.zero;
+    [SerializeField, Range(0, 20)] private int treeChancePercent = 3;
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
     private HashSet<Vector2Int> dirtyVisualChunks = new HashSet<Vector2Int>();
     private HashSet<Vector2Int> dirtyColliderChunks = new HashSet<Vector2Int>();
@@ -288,5 +289,23 @@ public class World : MonoBehaviour
             terrainHeight + 1f,
             playerSpawnXZ.y + 0.5f
         );
+    }
+    
+    public bool ShouldPlaceTree(int globalX, int globalZ)
+    {
+        int hash = GetDeterministicHash(globalX, globalZ);
+        return hash % 100 < treeChancePercent;
+    }
+
+    private int GetDeterministicHash(int x, int z)
+    {
+        unchecked
+        {
+            int hash = x;
+            hash = hash * 397 ^ z;
+            hash = hash * 397 ^ seed;
+            hash ^= hash >> 16;
+            return hash & 0x7fffffff;
+        }
     }
 }

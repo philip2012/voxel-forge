@@ -155,6 +155,7 @@ public class Chunk : MonoBehaviour
         highestSolidY = -1;
         System.Array.Clear(solidVoxelCountByY, 0, solidVoxelCountByY.Length);
 
+        // Pass 1: terrain
         for (int z = 0; z < VoxelData.ChunkWidth; z++)
         {
             for (int x = 0; x < VoxelData.ChunkWidth; x++)
@@ -182,6 +183,19 @@ public class Chunk : MonoBehaviour
                         SetVoxel(x, y, z, BlockType.Stone);
                     }
                 }
+            }
+        }
+
+        // Pass 2: trees
+        for (int z = 0; z < VoxelData.ChunkWidth; z++)
+        {
+            for (int x = 0; x < VoxelData.ChunkWidth; x++)
+            {
+                int globalX = chunkOriginX + x;
+                int globalZ = chunkOriginZ + z;
+                int terrainHeight = world.GetTerrainHeight(globalX, globalZ);
+
+                TryGenerateTree(x, terrainHeight, z, globalX, globalZ);
             }
         }
     }
@@ -341,6 +355,70 @@ public class Chunk : MonoBehaviour
         while (highestSolidY >= 0 && solidVoxelCountByY[highestSolidY] == 0)
         {
             highestSolidY--;
+        }
+    }
+
+    private void TryGenerateTree(int x, int terrainHeight, int z, int globalX, int globalZ)
+    {
+        if (!world.ShouldPlaceTree(globalX, globalZ))
+        {
+            return;
+        }
+
+        // Keep trees away from chunk borders for now.
+        // This prevents leaves crossing into neighboring chunks.
+        if (x < 2 || x > VoxelData.ChunkWidth - 3 || z < 2 || z > VoxelData.ChunkWidth - 3)
+        {
+            return;
+        }
+
+        int trunkHeight = 4;
+        int treeTopY = terrainHeight + trunkHeight + 1;
+
+        if (treeTopY >= VoxelData.ChunkHeight)
+        {
+            return;
+        }
+
+        for (int y = terrainHeight + 1; y <= terrainHeight + trunkHeight; y++)
+        {
+            SetVoxel(x, y, z, BlockType.Wood);
+        }
+
+        int leafStartY = terrainHeight + trunkHeight - 1;
+        int leafEndY = terrainHeight + trunkHeight + 1;
+
+        for (int leafY = leafStartY; leafY <= leafEndY; leafY++)
+        {
+            for (int offsetZ = -2; offsetZ <= 2; offsetZ++)
+            {
+                for (int offsetX = -2; offsetX <= 2; offsetX++)
+                {
+                    int distance = Mathf.Abs(offsetX) + Mathf.Abs(offsetZ);
+
+                    if (distance > 3)
+                    {
+                        continue;
+                    }
+
+                    if (leafY == leafEndY && distance > 1)
+                    {
+                        continue;
+                    }
+
+                    int leafX = x + offsetX;
+                    int leafZ = z + offsetZ;
+
+                    bool isTrunkPosition = leafX == x && leafZ == z && leafY <= terrainHeight + trunkHeight;
+
+                    if (isTrunkPosition)
+                    {
+                        continue;
+                    }
+
+                    SetVoxel(leafX, leafY, leafZ, BlockType.Leaves);
+                }
+            }
         }
     }
 }

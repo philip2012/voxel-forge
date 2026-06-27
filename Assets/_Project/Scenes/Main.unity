@@ -260,7 +260,6 @@ GameObject:
   - component: {fileID: 1342417685}
   - component: {fileID: 1342417686}
   - component: {fileID: 1342417687}
-  - component: {fileID: 1342417688}
   - component: {fileID: 1342417689}
   - component: {fileID: 1342417690}
   m_Layer: 0
@@ -420,19 +419,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Crosshair
   size: 15
   thickness: 3
---- !u!114 &1342417688
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1342417681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abc6f68289b274449aa392a1e857a160, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SelectedBlockDisplay
-  playerInteraction: {fileID: 1342417686}
 --- !u!114 &1342417689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -583,6 +569,7 @@ MonoBehaviour:
   seed: 12345
   playerTransform: {fileID: 1882910950}
   playerSpawnXZ: {x: 0, y: 0}
+  treeChancePercent: 3
 --- !u!4 &2118334476
 Transform:
   m_ObjectHideFlags: 0
