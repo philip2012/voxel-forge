@@ -19,6 +19,7 @@ public class World : MonoBehaviour
     private HashSet<Vector2Int> dirtyVisualChunks = new HashSet<Vector2Int>();
     private HashSet<Vector2Int> dirtyColliderChunks = new HashSet<Vector2Int>();
     private List<Vector2Int> processedChunksThisFrame = new List<Vector2Int>();
+    private List<Vector2Int> chunksToUnload = new List<Vector2Int>();
 
     private void Start()
     {
@@ -46,6 +47,7 @@ public class World : MonoBehaviour
         {
             currentPlayerChunkCoordinate = GetChunkCoordinateFromWorldPosition(playerTransform.position);
             LoadChunksAroundPlayer();
+            UnloadDistantChunks();
         }
     }
 
@@ -65,6 +67,7 @@ public class World : MonoBehaviour
 
         currentPlayerChunkCoordinate = playerChunkCoordinate;
         LoadChunksAroundPlayer();
+        UnloadDistantChunks();
     }
 
     private void LateUpdate()
@@ -370,5 +373,43 @@ public class World : MonoBehaviour
         MarkChunkDirty(chunkCoordinate + new Vector2Int(1, 0), true);
         MarkChunkDirty(chunkCoordinate + new Vector2Int(0, -1), true);
         MarkChunkDirty(chunkCoordinate + new Vector2Int(0, 1), true);
+    }
+
+    private void UnloadDistantChunks()
+    {
+        chunksToUnload.Clear();
+
+        foreach (Vector2Int chunkCoordinate in activeChunks.Keys)
+        {
+            if (!IsChunkWithinViewDistance(chunkCoordinate))
+            {
+                chunksToUnload.Add(chunkCoordinate);
+            }
+        }
+
+        foreach (Vector2Int chunkCoordinate in chunksToUnload)
+        {
+            if (!activeChunks.TryGetValue(chunkCoordinate, out Chunk chunk))
+            {
+                continue;
+            }
+
+            dirtyVisualChunks.Remove(chunkCoordinate);
+            dirtyColliderChunks.Remove(chunkCoordinate);
+
+            activeChunks.Remove(chunkCoordinate);
+
+            Destroy(chunk.gameObject);
+
+            MarkExistingNeighborChunksDirty(chunkCoordinate);
+        }
+    }
+
+    private bool IsChunkWithinViewDistance(Vector2Int chunkCoordinate)
+    {
+        int distanceX = Mathf.Abs(chunkCoordinate.x - currentPlayerChunkCoordinate.x);
+        int distanceZ = Mathf.Abs(chunkCoordinate.y - currentPlayerChunkCoordinate.y);
+
+        return distanceX <= viewDistanceInChunks && distanceZ <= viewDistanceInChunks;
     }
 }
