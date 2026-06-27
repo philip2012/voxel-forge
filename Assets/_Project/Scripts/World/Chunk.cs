@@ -159,9 +159,11 @@ public class Chunk : MonoBehaviour
         {
             for (int y = 0; y < VoxelData.ChunkHeight; y++)
             {
+                int rowStartIndex = VoxelData.ChunkWidth * (y + VoxelData.ChunkHeight * z);
+
                 for (int x = 0; x < VoxelData.ChunkWidth; x++)
                 {
-                    BlockType blockType = GetVoxel(x, y, z);
+                    BlockType blockType = (BlockType)voxelMap[rowStartIndex + x];
 
                     if (blockType == BlockType.Air)
                     {
