@@ -19,6 +19,7 @@ public class World : MonoBehaviour
     [SerializeField, Range(0, 20)] private int treeChancePercent = 1;
     [SerializeField] private string saveFileName = "voxel_save.json";
     [SerializeField, Min(1)] private int maxChunkLoadsPerFrame = 1;
+    [SerializeField] private bool enableSaveDebugLogs = false;
 
     private Queue<Vector2Int> chunkLoadQueue = new Queue<Vector2Int>();
     private HashSet<Vector2Int> queuedChunks = new HashSet<Vector2Int>();
@@ -460,7 +461,7 @@ public class World : MonoBehaviour
             if (File.Exists(SavePath))
             {
                 File.Delete(SavePath);
-                Debug.Log($"Deleted empty save file at {SavePath}");
+                LogSaveMessage($"Deleted empty save file in: {SavePath}");
             }
 
             return;
@@ -484,7 +485,7 @@ public class World : MonoBehaviour
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(SavePath, json);
 
-        Debug.Log($"Saved {saveData.modifiedBlocks.Count} modified blocks to {SavePath}");
+        LogSaveMessage($"Saved {saveData.modifiedBlocks.Count} modified blocks to {SavePath}");
     }
 
     private void LoadModifiedBlocksFromDisk()
@@ -511,7 +512,7 @@ public class World : MonoBehaviour
             SaveModifiedBlock(position, savedBlock.blockType);
         }
 
-        Debug.Log($"Loaded {modifiedBlocks.Count} modified blocks from {SavePath}");
+        LogSaveMessage($"Loaded {saveData.modifiedBlocks.Count} modified blocks to {SavePath}");
     }
 
     private void HandleDevSaveShortcuts()
@@ -535,11 +536,11 @@ public class World : MonoBehaviour
         if (File.Exists(SavePath))
         {
             File.Delete(SavePath);
-            Debug.Log($"Deleted save file at {SavePath}");
+            LogSaveMessage($"Deleted save file at: {SavePath}");
         }
         else
         {
-            Debug.Log("No save file found to delete.");
+            LogSaveMessage("No save file found to delete");
         }
     }
 
@@ -635,6 +636,14 @@ public class World : MonoBehaviour
         out Dictionary<Vector3Int, BlockType> chunkModifiedBlocks)
     {
         return modifiedBlocksByChunk.TryGetValue(chunkCoordinate, out chunkModifiedBlocks);
+    }
+
+    private void LogSaveMessage(string message)
+    {
+        if (enableSaveDebugLogs)
+        {
+            Debug.Log(message);
+        }
     }
 }
 
