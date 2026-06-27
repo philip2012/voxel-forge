@@ -15,6 +15,7 @@ public class Chunk : MonoBehaviour
     private Mesh visualMesh;
     private Mesh colliderMesh;
     private Bounds chunkMeshBounds;
+    private int highestSolidY = -1;
 
     private const int EstimatedVisibleFacesPerColumn = 6;
     private const int EstimatedVisibleFaceCount = VoxelData.ChunkWidth * VoxelData.ChunkWidth * EstimatedVisibleFacesPerColumn;
@@ -103,7 +104,22 @@ public class Chunk : MonoBehaviour
     private void SetVoxel(int x, int y, int z, BlockType blockType)
     {
         int index = GetVoxelIndex(x, y, z);
+
+        BlockType oldBlockType = (BlockType)voxelMap[index];
+
+        bool oldBlockWasSolid = BlockDatabase.IsSolid(oldBlockType);
+        bool newBlockIsSolid = BlockDatabase.IsSolid(blockType);
+
         voxelMap[index] = (byte)blockType;
+
+        if (newBlockIsSolid && y > highestSolidY)
+        {
+            highestSolidY = y;
+        }
+        else if (oldBlockWasSolid && !newBlockIsSolid && y == highestSolidY)
+        {
+            RecalculateHighestSolidY();
+        }
     }
 
     private BlockType GetVoxel(int x, int y, int z)
@@ -155,9 +171,15 @@ public class Chunk : MonoBehaviour
         uvs.Clear();
         normals.Clear();
 
+        if (highestSolidY < 0)
+        {
+            ApplyMesh(updateCollider);
+            return;
+        }
+
         for (int z = 0; z < VoxelData.ChunkWidth; z++)
         {
-            for (int y = 0; y < VoxelData.ChunkHeight; y++)
+            for (int y = 0; y <= highestSolidY; y++)
             {
                 int rowStartIndex = VoxelData.ChunkWidth * (y + VoxelData.ChunkHeight * z);
 
@@ -290,5 +312,29 @@ public class Chunk : MonoBehaviour
     public void RefreshColliderOnly()
     {
         UpdateColliderMesh();
+    }
+
+    private void RecalculateHighestSolidY()
+    {
+        for (int y = VoxelData.ChunkHeight - 1; y >= 0; y--)
+        {
+            for (int z = 0; z < VoxelData.ChunkWidth; z++)
+            {
+                int rowStartIndex = VoxelData.ChunkWidth * (y + VoxelData.ChunkHeight * z);
+
+                for (int x = 0; x < VoxelData.ChunkWidth; x++)
+                {
+                    BlockType blockType = (BlockType)voxelMap[rowStartIndex + x];
+
+                    if (BlockDatabase.IsSolid(blockType))
+                    {
+                        highestSolidY = y;
+                        return;
+                    }
+                }
+            }
+        }
+
+        highestSolidY = -1;
     }
 }
