@@ -158,22 +158,27 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = 0; z < VoxelData.ChunkWidth; z++)
                 {
-                    if (GetVoxel(x, y, z) != BlockType.Air)
+                    BlockType blockType = GetVoxel(x, y, z);
+
+                    if (blockType == BlockType.Air)
                     {
-                        for (int faceIndex = 0; faceIndex < VoxelData.FaceChecks.Length; faceIndex++)
+                        continue;
+                    }
+
+                    BlockData blockData = BlockDatabase.GetBlockData(blockType);
+
+                    for (int faceIndex = 0; faceIndex < VoxelData.FaceChecks.Length; faceIndex++)
+                    {
+                        Vector3Int neighborOffset = VoxelData.FaceChecks[faceIndex];
+
+                        int neighborX = x + neighborOffset.x;
+                        int neighborY = y + neighborOffset.y;
+                        int neighborZ = z + neighborOffset.z;
+
+                        if (!CheckVoxel(neighborX, neighborY, neighborZ))
                         {
-                            Vector3Int neighborOffset = VoxelData.FaceChecks[faceIndex];
-
-                            int neighborX = x + neighborOffset.x;
-                            int neighborY = y + neighborOffset.y;
-                            int neighborZ = z + neighborOffset.z;
-
-                            if (!CheckVoxel(neighborX, neighborY, neighborZ))
-                            {
-                                AddFace(x, y, z, faceIndex);
-                            }
+                            AddFace(x, y, z, faceIndex, blockData);
                         }
-
                     }
                 }
             }
@@ -209,7 +214,7 @@ public class Chunk : MonoBehaviour
         return blockData.isSolid;
     }
 
-    private void AddFace(int x, int y, int z, int faceIndex)
+    private void AddFace(int x, int y, int z, int faceIndex, BlockData blockData)
     {
         int vertexIndex = vertices.Count;
         Vector3 blockPosition = new Vector3(x, y, z);
@@ -230,8 +235,6 @@ public class Chunk : MonoBehaviour
         triangles.Add(vertexIndex + 1);
         triangles.Add(vertexIndex + 3);
 
-        BlockType blockType = GetVoxel(x, y, z);
-        BlockData blockData = BlockDatabase.GetBlockData(blockType);
         Vector2Int textureTile = blockData.GetTextureForFace(faceIndex);
 
         float textureSize = VoxelData.NormalizedBlockTextureSize;
