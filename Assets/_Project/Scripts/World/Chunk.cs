@@ -16,6 +16,7 @@ public class Chunk : MonoBehaviour
     private Mesh colliderMesh;
     private Bounds chunkMeshBounds;
     private int highestSolidY = -1;
+    private int[] solidVoxelCountByY = new int[VoxelData.ChunkHeight];
 
     private int chunkOriginX;
     private int chunkOriginZ;
@@ -118,13 +119,28 @@ public class Chunk : MonoBehaviour
 
         voxelMap[index] = (byte)blockType;
 
-        if (newBlockIsSolid && y > highestSolidY)
+        if (oldBlockWasSolid == newBlockIsSolid)
         {
-            highestSolidY = y;
+            return;
         }
-        else if (oldBlockWasSolid && !newBlockIsSolid && y == highestSolidY)
+
+        if (newBlockIsSolid)
         {
-            RecalculateHighestSolidY();
+            solidVoxelCountByY[y]++;
+
+            if (y > highestSolidY)
+            {
+                highestSolidY = y;
+            }
+        }
+        else
+        {
+            solidVoxelCountByY[y]--;
+
+            if (y == highestSolidY && solidVoxelCountByY[y] == 0)
+            {
+                LowerHighestSolidY();
+            }
         }
     }
 
@@ -137,6 +153,7 @@ public class Chunk : MonoBehaviour
     private void PopulateVoxelMap()
     {
         highestSolidY = -1;
+        System.Array.Clear(solidVoxelCountByY, 0, solidVoxelCountByY.Length);
 
         for (int z = 0; z < VoxelData.ChunkWidth; z++)
         {
@@ -319,27 +336,11 @@ public class Chunk : MonoBehaviour
         UpdateColliderMesh();
     }
 
-    private void RecalculateHighestSolidY()
+    private void LowerHighestSolidY()
     {
-        for (int y = VoxelData.ChunkHeight - 1; y >= 0; y--)
+        while (highestSolidY >= 0 && solidVoxelCountByY[highestSolidY] == 0)
         {
-            for (int z = 0; z < VoxelData.ChunkWidth; z++)
-            {
-                int rowStartIndex = VoxelData.ChunkWidth * (y + VoxelData.ChunkHeight * z);
-
-                for (int x = 0; x < VoxelData.ChunkWidth; x++)
-                {
-                    BlockType blockType = (BlockType)voxelMap[rowStartIndex + x];
-
-                    if (BlockDatabase.IsSolid(blockType))
-                    {
-                        highestSolidY = y;
-                        return;
-                    }
-                }
-            }
+            highestSolidY--;
         }
-
-        highestSolidY = -1;
     }
 }
