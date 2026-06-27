@@ -262,6 +262,7 @@ GameObject:
   - component: {fileID: 1342417687}
   - component: {fileID: 1342417688}
   - component: {fileID: 1342417689}
+  - component: {fileID: 1342417690}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -449,6 +450,22 @@ MonoBehaviour:
   outlinePadding: 0.01
   outlineColor: {r: 1, g: 1, b: 1, a: 1}
   lineMaterial: {fileID: 0}
+--- !u!114 &1342417690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342417681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37cc291baf293492585d44cda3ecde6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HotbarDisplay
+  playerInteraction: {fileID: 0}
+  slotSize: 80
+  slotSpacing: 8
+  bottomOffset: 30
 --- !u!1 &1882910947
 GameObject:
   m_ObjectHideFlags: 0

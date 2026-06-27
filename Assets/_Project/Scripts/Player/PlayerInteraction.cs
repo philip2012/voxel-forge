@@ -8,6 +8,8 @@ public class PlayerInteraction : MonoBehaviour
     [SerializeField] private float interactionDistance = 12f;
     [SerializeField] private BlockType blockToPlace = BlockType.Dirt;
     public BlockType SelectedBlock => blockToPlace;
+    public int SelectedBlockIndex => selectedBlockIndex;
+    public int PlaceableBlockCount => placeableBlocks.Length;
     [SerializeField] private CharacterController characterController;
 
     [SerializeField] private BlockType[] placeableBlocks =
@@ -195,5 +197,15 @@ public class PlayerInteraction : MonoBehaviour
         blockPosition = Vector3Int.FloorToInt(blockPoint);
 
         return true;
+    }
+
+    public BlockType GetPlaceableBlock(int index)
+    {
+        if (index < 0 || index >= placeableBlocks.Length)
+        {
+            return BlockType.Air;
+        }
+
+        return placeableBlocks[index];
     }
 }
