@@ -203,27 +203,24 @@ public class Chunk : MonoBehaviour
             return false;
         }
 
-        BlockType blockType;
-
         if (
             x >= 0 && x < VoxelData.ChunkWidth &&
             z >= 0 && z < VoxelData.ChunkWidth
         )
         {
-            blockType = GetVoxel(x, y, z);
-        }
-        else
-        {
-            Vector3Int globalPosition = new Vector3Int(
-                chunkCoordinate.x * VoxelData.ChunkWidth + x,
-                y,
-                chunkCoordinate.y * VoxelData.ChunkWidth + z
-            );
+            int index = x + VoxelData.ChunkWidth * (y + VoxelData.ChunkHeight * z);
+            BlockType blockType = (BlockType)voxelMap[index];
 
-            blockType = world.GetBlock(globalPosition);
+            return BlockDatabase.IsSolid(blockType);
         }
 
-        return BlockDatabase.IsSolid(blockType);
+        Vector3Int globalPosition = new Vector3Int(
+            chunkCoordinate.x * VoxelData.ChunkWidth + x,
+            y,
+            chunkCoordinate.y * VoxelData.ChunkWidth + z
+        );
+
+        return BlockDatabase.IsSolid(world.GetBlock(globalPosition));
     }
 
     private void AddFace(int x, int y, int z, int faceIndex, BlockData blockData)
