@@ -68,4 +68,9 @@ public static class BlockDatabase
     {
         return Blocks[(int)blockType];
     }
+
+    public static bool IsSolid(BlockType blockType)
+    {
+        return Blocks[(int)blockType].isSolid;
+    }
 }

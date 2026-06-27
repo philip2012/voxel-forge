@@ -210,8 +210,7 @@ public class Chunk : MonoBehaviour
             blockType = world.GetBlock(globalPosition);
         }
 
-        BlockData blockData = BlockDatabase.GetBlockData(blockType);
-        return blockData.isSolid;
+        return BlockDatabase.IsSolid(blockType);
     }
 
     private void AddFace(int x, int y, int z, int faceIndex, BlockData blockData)

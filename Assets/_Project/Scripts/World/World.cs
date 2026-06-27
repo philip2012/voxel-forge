@@ -128,10 +128,10 @@ public class World : MonoBehaviour
             return;
         }
 
-        BlockData oldBlockData = BlockDatabase.GetBlockData(oldBlockType);
-        BlockData newBlockData = BlockDatabase.GetBlockData(blockType);
+        bool oldBlockIsSolid = BlockDatabase.IsSolid(oldBlockType);
+        bool newBlockIsSolid = BlockDatabase.IsSolid(blockType);
 
-        bool colliderChanged = oldBlockData.isSolid != newBlockData.isSolid;
+        bool colliderChanged = oldBlockIsSolid != newBlockIsSolid;
 
         chunk.SetVoxelFromLocalPosition(localX, globalPosition.y, localZ, blockType);
         MarkChunkDirty(chunkCoordinate, colliderChanged);
@@ -202,9 +202,8 @@ public class World : MonoBehaviour
         }
 
         BlockType neighborBlockType = GetBlock(neighborGlobalPosition);
-        BlockData neighborBlockData = BlockDatabase.GetBlockData(neighborBlockType);
 
-        if (neighborBlockData.isSolid)
+        if (BlockDatabase.IsSolid(neighborBlockType))
         {
             MarkChunkDirty(neighborChunkCoordinate, updateCollider);
         }
