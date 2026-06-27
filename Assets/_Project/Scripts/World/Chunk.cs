@@ -193,9 +193,17 @@ public class Chunk : MonoBehaviour
 
     private bool CheckVoxel(int x, int y, int z)
     {
+        if (y < 0 || y >= VoxelData.ChunkHeight)
+        {
+            return false;
+        }
+
         BlockType blockType;
 
-        if (IsVoxelInsideChunk(x, y, z))
+        if (
+            x >= 0 && x < VoxelData.ChunkWidth &&
+            z >= 0 && z < VoxelData.ChunkWidth
+        )
         {
             blockType = GetVoxel(x, y, z);
         }
