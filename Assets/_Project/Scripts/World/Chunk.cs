@@ -136,34 +136,33 @@ public class Chunk : MonoBehaviour
 
     private void PopulateVoxelMap()
     {
+        highestSolidY = -1;
+
         for (int z = 0; z < VoxelData.ChunkWidth; z++)
         {
-            for (int y = 0; y < VoxelData.ChunkHeight; y++)
+            for (int x = 0; x < VoxelData.ChunkWidth; x++)
             {
-                for (int x = 0; x < VoxelData.ChunkWidth; x++)
-                {
-                    int globalX = chunkOriginX + x;
-                    int globalZ = chunkOriginZ + z;
-                    int terrainHeight = world.GetTerrainHeight(globalX, globalZ);
+                int globalX = chunkOriginX + x;
+                int globalZ = chunkOriginZ + z;
+                int terrainHeight = world.GetTerrainHeight(globalX, globalZ);
 
+                for (int y = 0; y <= terrainHeight; y++)
+                {
                     if (y == 0)
                     {
                         SetVoxel(x, y, z, BlockType.Bedrock);
                     }
-                    else if (y <= terrainHeight)
+                    else if (y == terrainHeight)
                     {
-                        if (y == terrainHeight)
-                        {
-                            SetVoxel(x, y, z, BlockType.Grass);
-                        }
-                        else if (y >= terrainHeight - 3)
-                        {
-                            SetVoxel(x, y, z, BlockType.Dirt);
-                        }
-                        else
-                        {
-                            SetVoxel(x, y, z, BlockType.Stone);
-                        }
+                        SetVoxel(x, y, z, BlockType.Grass);
+                    }
+                    else if (y >= terrainHeight - 3)
+                    {
+                        SetVoxel(x, y, z, BlockType.Dirt);
+                    }
+                    else
+                    {
+                        SetVoxel(x, y, z, BlockType.Stone);
                     }
                 }
             }
