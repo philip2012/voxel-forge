@@ -14,6 +14,7 @@ public class World : MonoBehaviour
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Vector2Int playerSpawnXZ = Vector2Int.zero;
     [SerializeField, Range(0, 20)] private int treeChancePercent = 3;
+    private Vector2Int currentPlayerChunkCoordinate = new Vector2Int(int.MinValue, int.MinValue);
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
     private HashSet<Vector2Int> dirtyVisualChunks = new HashSet<Vector2Int>();
     private HashSet<Vector2Int> dirtyColliderChunks = new HashSet<Vector2Int>();
@@ -40,6 +41,30 @@ public class World : MonoBehaviour
         }
 
         SpawnPlayerOnTerrain();
+
+        if (playerTransform != null)
+        {
+            currentPlayerChunkCoordinate = GetChunkCoordinateFromWorldPosition(playerTransform.position);
+            LoadChunksAroundPlayer();
+        }
+    }
+
+    private void Update()
+    {
+        if (playerTransform == null)
+        {
+            return;
+        }
+
+        Vector2Int playerChunkCoordinate = GetChunkCoordinateFromWorldPosition(playerTransform.position);
+
+        if (playerChunkCoordinate == currentPlayerChunkCoordinate)
+        {
+            return;
+        }
+
+        currentPlayerChunkCoordinate = playerChunkCoordinate;
+        LoadChunksAroundPlayer();
     }
 
     private void LateUpdate()
@@ -307,5 +332,43 @@ public class World : MonoBehaviour
             hash ^= hash >> 16;
             return hash & 0x7fffffff;
         }
+    }
+
+    private Vector2Int GetChunkCoordinateFromWorldPosition(Vector3 worldPosition)
+    {
+        int chunkX = Mathf.FloorToInt(worldPosition.x / VoxelData.ChunkWidth);
+        int chunkZ = Mathf.FloorToInt(worldPosition.z / VoxelData.ChunkWidth);
+
+        return new Vector2Int(chunkX, chunkZ);
+    }
+
+    private void LoadChunksAroundPlayer()
+    {
+        for (int x = -viewDistanceInChunks; x <= viewDistanceInChunks; x++)
+        {
+            for (int z = -viewDistanceInChunks; z <= viewDistanceInChunks; z++)
+            {
+                Vector2Int chunkCoordinate = currentPlayerChunkCoordinate + new Vector2Int(x, z);
+
+                if (activeChunks.ContainsKey(chunkCoordinate))
+                {
+                    continue;
+                }
+
+                Chunk chunk = SpawnChunk(chunkCoordinate);
+                chunk.Initialize(this, chunkCoordinate);
+                chunk.GenerateChunkMesh();
+
+                MarkExistingNeighborChunksDirty(chunkCoordinate);
+            }
+        }
+    }
+
+    private void MarkExistingNeighborChunksDirty(Vector2Int chunkCoordinate)
+    {
+        MarkChunkDirty(chunkCoordinate + new Vector2Int(-1, 0), true);
+        MarkChunkDirty(chunkCoordinate + new Vector2Int(1, 0), true);
+        MarkChunkDirty(chunkCoordinate + new Vector2Int(0, -1), true);
+        MarkChunkDirty(chunkCoordinate + new Vector2Int(0, 1), true);
     }
 }
