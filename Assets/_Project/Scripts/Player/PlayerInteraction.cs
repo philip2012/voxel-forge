@@ -56,20 +56,20 @@ public class PlayerInteraction : MonoBehaviour
 
     private void BreakBlock()
     {
-        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-
-        if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance))
+        if (!TryGetTargetBlockPosition(out Vector3Int blockPosition))
         {
-            Vector3 blockPoint = hit.point - hit.normal * 0.01f;
-            Vector3Int blockPosition = Vector3Int.FloorToInt(blockPoint);
-            BlockType blockType = world.GetBlock(blockPosition);
-            BlockData blockData = BlockDatabase.GetBlockData(blockType);
-            if (!blockData.isBreakable)
-            {
-                return;
-            }
-            world.SetBlock(blockPosition, BlockType.Air);
+            return;
         }
+
+        BlockType blockType = world.GetBlock(blockPosition);
+        BlockData blockData = BlockDatabase.GetBlockData(blockType);
+
+        if (!blockData.isBreakable)
+        {
+            return;
+        }
+
+        world.SetBlock(blockPosition, BlockType.Air);
     }
 
     private void PlaceBlock()
@@ -168,5 +168,32 @@ public class PlayerInteraction : MonoBehaviour
         );
 
         return characterController.bounds.Intersects(blockBounds);
+    }
+
+    public bool TryGetTargetBlockPosition(out Vector3Int blockPosition)
+    {
+        blockPosition = default;
+
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            return false;
+        }
+
+        if (playerCamera == null)
+        {
+            return false;
+        }
+
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+
+        if (!Physics.Raycast(ray, out RaycastHit hit, interactionDistance))
+        {
+            return false;
+        }
+
+        Vector3 blockPoint = hit.point - hit.normal * 0.01f;
+        blockPosition = Vector3Int.FloorToInt(blockPoint);
+
+        return true;
     }
 }
