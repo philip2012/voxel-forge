@@ -428,24 +428,27 @@ public class Chunk : MonoBehaviour
 
     private void ApplySavedBlocks()
     {
-        for (int z = 0; z < VoxelData.ChunkWidth; z++)
+        if (!world.TryGetModifiedBlocksForChunk(
+            chunkCoordinate,
+            out Dictionary<Vector3Int, BlockType> chunkModifiedBlocks))
         {
-            for (int y = 0; y < VoxelData.ChunkHeight; y++)
-            {
-                for (int x = 0; x < VoxelData.ChunkWidth; x++)
-                {
-                    Vector3Int globalPosition = new Vector3Int(
-                        chunkOriginX + x,
-                        y,
-                        chunkOriginZ + z
-                    );
+            return;
+        }
 
-                    if (world.TryGetModifiedBlock(globalPosition, out BlockType savedBlockType))
-                    {
-                        SetVoxel(x, y, z, savedBlockType);
-                    }
-                }
+        foreach (KeyValuePair<Vector3Int, BlockType> savedBlock in chunkModifiedBlocks)
+        {
+            Vector3Int globalPosition = savedBlock.Key;
+
+            int localX = globalPosition.x - chunkOriginX;
+            int localY = globalPosition.y;
+            int localZ = globalPosition.z - chunkOriginZ;
+
+            if (!IsVoxelInsideChunk(localX, localY, localZ))
+            {
+                continue;
             }
+
+            SetVoxel(localX, localY, localZ, savedBlock.Value);
         }
     }
 

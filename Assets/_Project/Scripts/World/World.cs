@@ -25,6 +25,8 @@ public class World : MonoBehaviour
     private string SavePath => Path.Combine(Application.persistentDataPath, saveFileName);
     private Vector2Int currentPlayerChunkCoordinate = new Vector2Int(int.MinValue, int.MinValue);
     private Dictionary<Vector3Int, BlockType> modifiedBlocks = new Dictionary<Vector3Int, BlockType>();
+    private Dictionary<Vector2Int, Dictionary<Vector3Int, BlockType>> modifiedBlocksByChunk =
+        new Dictionary<Vector2Int, Dictionary<Vector3Int, BlockType>>();
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
     private HashSet<Vector2Int> dirtyVisualChunks = new HashSet<Vector2Int>();
     private HashSet<Vector2Int> dirtyColliderChunks = new HashSet<Vector2Int>();
@@ -193,11 +195,11 @@ public class World : MonoBehaviour
 
         if (blockType == generatedBlockType)
         {
-            modifiedBlocks.Remove(globalPosition);
+            RemoveModifiedBlock(globalPosition);
         }
         else
         {
-            modifiedBlocks[globalPosition] = blockType;
+            SaveModifiedBlock(globalPosition, blockType);
         }
 
         MarkChunkDirty(chunkCoordinate, colliderChanged);
@@ -488,6 +490,7 @@ public class World : MonoBehaviour
     private void LoadModifiedBlocksFromDisk()
     {
         modifiedBlocks.Clear();
+        modifiedBlocksByChunk.Clear();
 
         if (!File.Exists(SavePath))
         {
@@ -505,7 +508,7 @@ public class World : MonoBehaviour
         foreach (ModifiedBlockSaveData savedBlock in saveData.modifiedBlocks)
         {
             Vector3Int position = new Vector3Int(savedBlock.x, savedBlock.y, savedBlock.z);
-            modifiedBlocks[position] = savedBlock.blockType;
+            SaveModifiedBlock(position, savedBlock.blockType);
         }
 
         Debug.Log($"Loaded {modifiedBlocks.Count} modified blocks from {SavePath}");
@@ -527,6 +530,7 @@ public class World : MonoBehaviour
     private void ClearSaveFile()
     {
         modifiedBlocks.Clear();
+        modifiedBlocksByChunk.Clear();
 
         if (File.Exists(SavePath))
         {
@@ -582,6 +586,55 @@ public class World : MonoBehaviour
 
             loadedThisFrame++;
         }
+    }
+
+    private Vector2Int GetChunkCoordinateFromBlockPosition(Vector3Int globalPosition)
+    {
+        int chunkX = Mathf.FloorToInt((float)globalPosition.x / VoxelData.ChunkWidth);
+        int chunkZ = Mathf.FloorToInt((float)globalPosition.z / VoxelData.ChunkWidth);
+
+        return new Vector2Int(chunkX, chunkZ);
+    }
+
+    private void SaveModifiedBlock(Vector3Int globalPosition, BlockType blockType)
+    {
+        modifiedBlocks[globalPosition] = blockType;
+
+        Vector2Int chunkCoordinate = GetChunkCoordinateFromBlockPosition(globalPosition);
+
+        if (!modifiedBlocksByChunk.TryGetValue(chunkCoordinate, out Dictionary<Vector3Int, BlockType> chunkModifiedBlocks))
+        {
+            chunkModifiedBlocks = new Dictionary<Vector3Int, BlockType>();
+            modifiedBlocksByChunk[chunkCoordinate] = chunkModifiedBlocks;
+        }
+
+        chunkModifiedBlocks[globalPosition] = blockType;
+    }
+
+    private void RemoveModifiedBlock(Vector3Int globalPosition)
+    {
+        modifiedBlocks.Remove(globalPosition);
+
+        Vector2Int chunkCoordinate = GetChunkCoordinateFromBlockPosition(globalPosition);
+
+        if (!modifiedBlocksByChunk.TryGetValue(chunkCoordinate, out Dictionary<Vector3Int, BlockType> chunkModifiedBlocks))
+        {
+            return;
+        }
+
+        chunkModifiedBlocks.Remove(globalPosition);
+
+        if (chunkModifiedBlocks.Count == 0)
+        {
+            modifiedBlocksByChunk.Remove(chunkCoordinate);
+        }
+    }
+
+    public bool TryGetModifiedBlocksForChunk(
+        Vector2Int chunkCoordinate,
+        out Dictionary<Vector3Int, BlockType> chunkModifiedBlocks)
+    {
+        return modifiedBlocksByChunk.TryGetValue(chunkCoordinate, out chunkModifiedBlocks);
     }
 }
 
