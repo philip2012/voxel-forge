@@ -10,6 +10,7 @@ public class Chunk : MonoBehaviour
     private MeshFilter meshFilter;
     private MeshCollider meshCollider;
     private byte[] voxelMap = new byte[VoxelData.ChunkVoxelCount];
+    private byte[] generatedVoxelMap = new byte[VoxelData.ChunkVoxelCount];
     private World world;
     private Vector2Int chunkCoordinate;
     private Mesh visualMesh;
@@ -198,7 +199,7 @@ public class Chunk : MonoBehaviour
                 TryGenerateTree(x, terrainHeight, z, globalX, globalZ);
             }
         }
-
+        System.Array.Copy(voxelMap, generatedVoxelMap, voxelMap.Length);
         // Pass 3: save player edits
         ApplySavedBlocks();
     }
@@ -446,5 +447,16 @@ public class Chunk : MonoBehaviour
                 }
             }
         }
+    }
+
+    public BlockType GetGeneratedVoxelFromLocalPosition(int x, int y, int z)
+    {
+        if (!IsVoxelInsideChunk(x, y, z))
+        {
+            return BlockType.Air;
+        }
+
+        int index = GetVoxelIndex(x, y, z);
+        return (BlockType)generatedVoxelMap[index];
     }
 }

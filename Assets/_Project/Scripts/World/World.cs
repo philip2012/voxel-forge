@@ -184,7 +184,22 @@ public class World : MonoBehaviour
         bool colliderChanged = oldBlockIsSolid != newBlockIsSolid;
 
         chunk.SetVoxelFromLocalPosition(localX, globalPosition.y, localZ, blockType);
-        modifiedBlocks[globalPosition] = blockType;
+
+        BlockType generatedBlockType = chunk.GetGeneratedVoxelFromLocalPosition(
+            localX,
+            globalPosition.y,
+            localZ
+        );
+
+        if (blockType == generatedBlockType)
+        {
+            modifiedBlocks.Remove(globalPosition);
+        }
+        else
+        {
+            modifiedBlocks[globalPosition] = blockType;
+        }
+
         MarkChunkDirty(chunkCoordinate, colliderChanged);
 
         if (!colliderChanged)
