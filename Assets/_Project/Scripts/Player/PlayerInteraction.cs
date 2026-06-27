@@ -7,9 +7,12 @@ public class PlayerInteraction : MonoBehaviour
     [SerializeField] private Camera playerCamera;
     [SerializeField] private float interactionDistance = 12f;
     [SerializeField] private BlockType blockToPlace = BlockType.Dirt;
+    [SerializeField] private float editCooldown = 0.08f;
+    private float nextEditTime;
     public BlockType SelectedBlock => blockToPlace;
     public int SelectedBlockIndex => selectedBlockIndex;
     public int PlaceableBlockCount => placeableBlocks.Length;
+    
     [SerializeField] private CharacterController characterController;
 
     [SerializeField] private BlockType[] placeableBlocks =
@@ -42,25 +45,36 @@ public class PlayerInteraction : MonoBehaviour
         {
             return;
         }
-        
+
         HandleBlockSelection();
+
+        if (Time.time < nextEditTime)
+        {
+            return;
+        }
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            BreakBlock();
+            if (BreakBlock())
+            {
+                nextEditTime = Time.time + editCooldown;
+            }
         }
 
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
-            PlaceBlock();
+            if (PlaceBlock())
+            {
+                nextEditTime = Time.time + editCooldown;
+            }
         }
     }
 
-    private void BreakBlock()
+    private bool BreakBlock()
     {
         if (!TryGetTargetBlockPosition(out Vector3Int blockPosition))
         {
-            return;
+            return false;
         }
 
         BlockType blockType = world.GetBlock(blockPosition);
@@ -68,26 +82,32 @@ public class PlayerInteraction : MonoBehaviour
 
         if (!blockData.isBreakable)
         {
-            return;
+            return false;
         }
 
         world.SetBlock(blockPosition, BlockType.Air);
+        return true;
     }
 
-    private void PlaceBlock()
+    private bool PlaceBlock()
     {
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
-        if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance))
+        if (!Physics.Raycast(ray, out RaycastHit hit, interactionDistance))
         {
-            Vector3 blockPoint = hit.point + hit.normal * 0.01f;
-            Vector3Int blockPosition = Vector3Int.FloorToInt(blockPoint);
-            if (IsBlockOverlappingPlayer(blockPosition))
-            {
-                return;
-            }
-            world.SetBlock(blockPosition, blockToPlace);
+            return false;
         }
+
+        Vector3 blockPoint = hit.point + hit.normal * 0.01f;
+        Vector3Int blockPosition = Vector3Int.FloorToInt(blockPoint);
+
+        if (IsBlockOverlappingPlayer(blockPosition))
+        {
+            return false;
+        }
+
+        world.SetBlock(blockPosition, blockToPlace);
+        return true;
     }
 
     private void HandleBlockSelection()
