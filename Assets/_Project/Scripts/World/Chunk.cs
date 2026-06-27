@@ -114,31 +114,34 @@ public class Chunk : MonoBehaviour
 
     private void PopulateVoxelMap()
     {
-        for (int x = 0; x < VoxelData.ChunkWidth; x++)
+        for (int z = 0; z < VoxelData.ChunkWidth; z++)
         {
-            for (int z = 0; z < VoxelData.ChunkWidth; z++)
+            for (int y = 0; y < VoxelData.ChunkHeight; y++)
             {
-                int globalX = chunkCoordinate.x * VoxelData.ChunkWidth + x;
-                int globalZ = chunkCoordinate.y * VoxelData.ChunkWidth + z;
-                int terrainHeight = world.GetTerrainHeight(globalX, globalZ);
-
-                for (int y = 0; y <= terrainHeight; y++)
+                for (int x = 0; x < VoxelData.ChunkWidth; x++)
                 {
+                    int globalX = chunkCoordinate.x * VoxelData.ChunkWidth + x;
+                    int globalZ = chunkCoordinate.y * VoxelData.ChunkWidth + z;
+                    int terrainHeight = world.GetTerrainHeight(globalX, globalZ);
+
                     if (y == 0)
                     {
                         SetVoxel(x, y, z, BlockType.Bedrock);
                     }
-                    else if (y == terrainHeight)
+                    else if (y <= terrainHeight)
                     {
-                        SetVoxel(x, y, z, BlockType.Grass);
-                    }
-                    else if (y >= terrainHeight - 3)
-                    {
-                        SetVoxel(x, y, z, BlockType.Dirt);
-                    }
-                    else
-                    {
-                        SetVoxel(x, y, z, BlockType.Stone);
+                        if (y == terrainHeight)
+                        {
+                            SetVoxel(x, y, z, BlockType.Grass);
+                        }
+                        else if (y >= terrainHeight - 3)
+                        {
+                            SetVoxel(x, y, z, BlockType.Dirt);
+                        }
+                        else
+                        {
+                            SetVoxel(x, y, z, BlockType.Stone);
+                        }
                     }
                 }
             }
@@ -152,11 +155,11 @@ public class Chunk : MonoBehaviour
         uvs.Clear();
         normals.Clear();
 
-        for (int x = 0; x < VoxelData.ChunkWidth; x++)
+        for (int z = 0; z < VoxelData.ChunkWidth; z++)
         {
             for (int y = 0; y < VoxelData.ChunkHeight; y++)
             {
-                for (int z = 0; z < VoxelData.ChunkWidth; z++)
+                for (int x = 0; x < VoxelData.ChunkWidth; x++)
                 {
                     BlockType blockType = GetVoxel(x, y, z);
 
