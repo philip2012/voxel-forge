@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System;
 using System.IO;
@@ -60,6 +61,8 @@ public class World : MonoBehaviour
 
     private void Update()
     {
+        HandleDevSaveShortcuts();
+
         if (playerTransform == null)
         {
             return;
@@ -73,6 +76,7 @@ public class World : MonoBehaviour
         }
 
         currentPlayerChunkCoordinate = playerChunkCoordinate;
+
         LoadChunksAroundPlayer();
         UnloadDistantChunks();
     }
@@ -433,6 +437,17 @@ public class World : MonoBehaviour
 
     private void SaveModifiedBlocksToDisk()
     {
+        if (modifiedBlocks.Count == 0)
+        {
+            if (File.Exists(SavePath))
+            {
+                File.Delete(SavePath);
+                Debug.Log($"Deleted empty save file at {SavePath}");
+            }
+
+            return;
+        }
+
         WorldSaveData saveData = new WorldSaveData();
 
         foreach (KeyValuePair<Vector3Int, BlockType> modifiedBlock in modifiedBlocks)
@@ -478,6 +493,34 @@ public class World : MonoBehaviour
         }
 
         Debug.Log($"Loaded {modifiedBlocks.Count} modified blocks from {SavePath}");
+    }
+
+    private void HandleDevSaveShortcuts()
+    {
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        if (Keyboard.current.f9Key.wasPressedThisFrame)
+        {
+            ClearSaveFile();
+        }
+    }
+
+    private void ClearSaveFile()
+    {
+        modifiedBlocks.Clear();
+
+        if (File.Exists(SavePath))
+        {
+            File.Delete(SavePath);
+            Debug.Log($"Deleted save file at {SavePath}");
+        }
+        else
+        {
+            Debug.Log("No save file found to delete.");
+        }
     }
 }
 
