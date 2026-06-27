@@ -18,6 +18,10 @@ public class World : MonoBehaviour
     [SerializeField] private Vector2Int playerSpawnXZ = Vector2Int.zero;
     [SerializeField, Range(0, 20)] private int treeChancePercent = 1;
     [SerializeField] private string saveFileName = "voxel_save.json";
+    [SerializeField, Min(1)] private int maxChunkLoadsPerFrame = 1;
+
+    private Queue<Vector2Int> chunkLoadQueue = new Queue<Vector2Int>();
+    private HashSet<Vector2Int> queuedChunks = new HashSet<Vector2Int>();
     private string SavePath => Path.Combine(Application.persistentDataPath, saveFileName);
     private Vector2Int currentPlayerChunkCoordinate = new Vector2Int(int.MinValue, int.MinValue);
     private Dictionary<Vector3Int, BlockType> modifiedBlocks = new Dictionary<Vector3Int, BlockType>();
@@ -83,6 +87,7 @@ public class World : MonoBehaviour
 
     private void LateUpdate()
     {
+        ProcessChunkLoadQueue();
         ProcessVisualRefreshQueue();
         ProcessColliderRefreshQueue();
     }
@@ -375,11 +380,7 @@ public class World : MonoBehaviour
                     continue;
                 }
 
-                Chunk chunk = SpawnChunk(chunkCoordinate);
-                chunk.Initialize(this, chunkCoordinate);
-                chunk.GenerateChunkMesh();
-
-                MarkExistingNeighborChunksDirty(chunkCoordinate);
+                QueueChunkLoad(chunkCoordinate);
             }
         }
     }
@@ -520,6 +521,51 @@ public class World : MonoBehaviour
         else
         {
             Debug.Log("No save file found to delete.");
+        }
+    }
+
+    private void QueueChunkLoad(Vector2Int chunkCoordinate)
+    {
+        if (activeChunks.ContainsKey(chunkCoordinate))
+        {
+            return;
+        }
+
+        if (queuedChunks.Contains(chunkCoordinate))
+        {
+            return;
+        }
+
+        queuedChunks.Add(chunkCoordinate);
+        chunkLoadQueue.Enqueue(chunkCoordinate);
+    }
+
+    private void ProcessChunkLoadQueue()
+    {
+        int loadedThisFrame = 0;
+
+        while (chunkLoadQueue.Count > 0 && loadedThisFrame < maxChunkLoadsPerFrame)
+        {
+            Vector2Int chunkCoordinate = chunkLoadQueue.Dequeue();
+            queuedChunks.Remove(chunkCoordinate);
+
+            if (activeChunks.ContainsKey(chunkCoordinate))
+            {
+                continue;
+            }
+
+            if (!IsChunkWithinViewDistance(chunkCoordinate))
+            {
+                continue;
+            }
+
+            Chunk chunk = SpawnChunk(chunkCoordinate);
+            chunk.Initialize(this, chunkCoordinate);
+            chunk.GenerateChunkMesh();
+
+            MarkExistingNeighborChunksDirty(chunkCoordinate);
+
+            loadedThisFrame++;
         }
     }
 }
