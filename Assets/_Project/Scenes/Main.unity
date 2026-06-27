@@ -569,7 +569,7 @@ MonoBehaviour:
   seed: 12345
   playerTransform: {fileID: 1882910950}
   playerSpawnXZ: {x: 0, y: 0}
-  treeChancePercent: 3
+  treeChancePercent: 1
 --- !u!4 &2118334476
 Transform:
   m_ObjectHideFlags: 0

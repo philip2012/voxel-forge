@@ -13,7 +13,7 @@ public class World : MonoBehaviour
     [SerializeField] private int seed = 12345;
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Vector2Int playerSpawnXZ = Vector2Int.zero;
-    [SerializeField, Range(0, 20)] private int treeChancePercent = 3;
+    [SerializeField, Range(0, 20)] private int treeChancePercent = 1;
     private Vector2Int currentPlayerChunkCoordinate = new Vector2Int(int.MinValue, int.MinValue);
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
     private HashSet<Vector2Int> dirtyVisualChunks = new HashSet<Vector2Int>();
