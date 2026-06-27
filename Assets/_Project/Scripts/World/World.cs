@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
+using System.IO;
 
 public class World : MonoBehaviour
 {
@@ -14,6 +16,8 @@ public class World : MonoBehaviour
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Vector2Int playerSpawnXZ = Vector2Int.zero;
     [SerializeField, Range(0, 20)] private int treeChancePercent = 1;
+    [SerializeField] private string saveFileName = "voxel_save.json";
+    private string SavePath => Path.Combine(Application.persistentDataPath, saveFileName);
     private Vector2Int currentPlayerChunkCoordinate = new Vector2Int(int.MinValue, int.MinValue);
     private Dictionary<Vector3Int, BlockType> modifiedBlocks = new Dictionary<Vector3Int, BlockType>();
     private Dictionary<Vector2Int, Chunk> activeChunks = new Dictionary<Vector2Int, Chunk>();
@@ -24,6 +28,8 @@ public class World : MonoBehaviour
 
     private void Start()
     {
+        LoadModifiedBlocksFromDisk();
+
         for (int x = -viewDistanceInChunks; x <= viewDistanceInChunks; x++)
         {
             for (int z = -viewDistanceInChunks; z <= viewDistanceInChunks; z++)
@@ -75,6 +81,11 @@ public class World : MonoBehaviour
     {
         ProcessVisualRefreshQueue();
         ProcessColliderRefreshQueue();
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveModifiedBlocksToDisk();
     }
 
     public BlockType GetBlock(Vector3Int globalPosition)
@@ -419,4 +430,68 @@ public class World : MonoBehaviour
     {
         return modifiedBlocks.TryGetValue(globalPosition, out blockType);
     }
+
+    private void SaveModifiedBlocksToDisk()
+    {
+        WorldSaveData saveData = new WorldSaveData();
+
+        foreach (KeyValuePair<Vector3Int, BlockType> modifiedBlock in modifiedBlocks)
+        {
+            Vector3Int position = modifiedBlock.Key;
+
+            saveData.modifiedBlocks.Add(new ModifiedBlockSaveData
+            {
+                x = position.x,
+                y = position.y,
+                z = position.z,
+                blockType = modifiedBlock.Value
+            });
+        }
+
+        string json = JsonUtility.ToJson(saveData, true);
+        File.WriteAllText(SavePath, json);
+
+        Debug.Log($"Saved {saveData.modifiedBlocks.Count} modified blocks to {SavePath}");
+    }
+
+    private void LoadModifiedBlocksFromDisk()
+    {
+        modifiedBlocks.Clear();
+
+        if (!File.Exists(SavePath))
+        {
+            return;
+        }
+
+        string json = File.ReadAllText(SavePath);
+        WorldSaveData saveData = JsonUtility.FromJson<WorldSaveData>(json);
+
+        if (saveData == null || saveData.modifiedBlocks == null)
+        {
+            return;
+        }
+
+        foreach (ModifiedBlockSaveData savedBlock in saveData.modifiedBlocks)
+        {
+            Vector3Int position = new Vector3Int(savedBlock.x, savedBlock.y, savedBlock.z);
+            modifiedBlocks[position] = savedBlock.blockType;
+        }
+
+        Debug.Log($"Loaded {modifiedBlocks.Count} modified blocks from {SavePath}");
+    }
+}
+
+[Serializable]
+public class WorldSaveData
+{
+    public List<ModifiedBlockSaveData> modifiedBlocks = new List<ModifiedBlockSaveData>();
+}
+
+[Serializable]
+public struct ModifiedBlockSaveData
+{
+    public int x;
+    public int y;
+    public int z;
+    public BlockType blockType;
 }
