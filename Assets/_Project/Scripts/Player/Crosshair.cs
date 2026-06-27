@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class Crosshair : MonoBehaviour
 {
-    [SerializeField] private int size = 12;
-    [SerializeField] private int thickness = 2;
+    [SerializeField] private int size = 15;
+    [SerializeField] private int thickness = 3;
 
     private void OnGUI()
     {
