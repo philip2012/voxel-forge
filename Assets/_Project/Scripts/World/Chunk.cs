@@ -17,6 +17,9 @@ public class Chunk : MonoBehaviour
     private Bounds chunkMeshBounds;
     private int highestSolidY = -1;
 
+    private int chunkOriginX;
+    private int chunkOriginZ;
+
     private const int EstimatedVisibleFacesPerColumn = 6;
     private const int EstimatedVisibleFaceCount = VoxelData.ChunkWidth * VoxelData.ChunkWidth * EstimatedVisibleFacesPerColumn;
 
@@ -62,6 +65,9 @@ public class Chunk : MonoBehaviour
     {
         this.world = world;
         this.chunkCoordinate = chunkCoordinate;
+
+        chunkOriginX = chunkCoordinate.x * VoxelData.ChunkWidth;
+        chunkOriginZ = chunkCoordinate.y * VoxelData.ChunkWidth;
 
         PopulateVoxelMap();
     }
@@ -136,8 +142,8 @@ public class Chunk : MonoBehaviour
             {
                 for (int x = 0; x < VoxelData.ChunkWidth; x++)
                 {
-                    int globalX = chunkCoordinate.x * VoxelData.ChunkWidth + x;
-                    int globalZ = chunkCoordinate.y * VoxelData.ChunkWidth + z;
+                    int globalX = chunkOriginX + x;
+                    int globalZ = chunkOriginZ + z;
                     int terrainHeight = world.GetTerrainHeight(globalX, globalZ);
 
                     if (y == 0)
@@ -237,9 +243,9 @@ public class Chunk : MonoBehaviour
         }
 
         Vector3Int globalPosition = new Vector3Int(
-            chunkCoordinate.x * VoxelData.ChunkWidth + x,
+            chunkOriginX + x,
             y,
-            chunkCoordinate.y * VoxelData.ChunkWidth + z
+            chunkOriginZ + z
         );
 
         return BlockDatabase.IsSolid(world.GetBlock(globalPosition));
