@@ -522,6 +522,11 @@ public class World : MonoBehaviour
             return;
         }
 
+        if (Keyboard.current.f5Key.wasPressedThisFrame)
+        {
+            SaveModifiedBlocksToDisk();
+        }
+
         if (Keyboard.current.f9Key.wasPressedThisFrame)
         {
             ClearSaveFile();

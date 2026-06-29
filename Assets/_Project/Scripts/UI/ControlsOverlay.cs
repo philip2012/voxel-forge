@@ -5,7 +5,7 @@ public class ControlsOverlay : MonoBehaviour
 {
     [SerializeField] private bool showControls;
     [SerializeField] private float width = 360f;
-    [SerializeField] private float height = 250f;
+    [SerializeField] private float height = 300f;
 
     private void Update()
     {
@@ -67,5 +67,8 @@ public class ControlsOverlay : MonoBehaviour
         y += lineHeight;
 
         GUI.Label(new Rect(x, y, width - 40f, lineHeight), "F9: Clear saved world");
+        y += lineHeight;
+
+        GUI.Label(new Rect(x, y, width - 40f, lineHeight), "F5: Save world");
     }
 }

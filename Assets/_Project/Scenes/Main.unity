@@ -513,7 +513,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ControlsOverlay
   showControls: 0
   width: 360
-  height: 250
+  height: 300
 --- !u!1 &1882910947
 GameObject:
   m_ObjectHideFlags: 0
