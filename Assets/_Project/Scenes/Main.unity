@@ -307,6 +307,7 @@ GameObject:
   - component: {fileID: 1342417687}
   - component: {fileID: 1342417689}
   - component: {fileID: 1342417690}
+  - component: {fileID: 1342417691}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -498,6 +499,21 @@ MonoBehaviour:
   slotSize: 80
   slotSpacing: 8
   bottomOffset: 30
+--- !u!114 &1342417691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1342417681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6ac15247843c4ffcb5d9de095c8d544, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ControlsOverlay
+  showControls: 0
+  width: 360
+  height: 250
 --- !u!1 &1882910947
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,6 +634,7 @@ MonoBehaviour:
   treeChancePercent: 1
   saveFileName: voxel_save.json
   maxChunkLoadsPerFrame: 1
+  enableSaveDebugLogs: 0
 --- !u!4 &2118334476
 Transform:
   m_ObjectHideFlags: 0
